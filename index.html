@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Max's Flight Log</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Caveat:wght@500;700&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: an airport departures board opens a flight log; each stop is a stamped chapter with pinned polaroids, then the PastizZ Party card, then the letter. */
+:root {
+  --paper: #ECEFE8;
+  --ink: #15201A;
+  --muted: #5A6860;
+  --card: #FFFFFF;
+  --line: #CBD3CB;
+  --red: #C8102E;      /* Lokomotiv / Malta red */
+  --green: #0B6B39;    /* Lokomotiv / Ireland green */
+  --gold: #C98A1E;     /* pastizz pastry */
+  --board: #121413;
+  --board-2: #1C1F1D;
+  --flap: #F3E9CC;
+  --amber: #F2B33D;
+  --shadow: 0 1px 2px rgba(20,32,26,.10), 0 8px 24px rgba(20,32,26,.10);
+  --f-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --f-body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --f-hand: "Caveat", "Segoe Print", "Bradley Hand", cursive;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0F1612; --ink: #E5EBE4; --muted: #94A39A; --card: #18211C; --line: #2A3630;
+  --red: #F0566A; --green: #43BE7A; --gold: #E9B14E;
+  --board: #0A0B0A; --board-2: #161917;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.35);
+  color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --paper: #0F1612; --ink: #E5EBE4; --muted: #94A39A; --card: #18211C; --line: #2A3630;
+  --red: #F0566A; --green: #43BE7A; --gold: #E9B14E;
+  --board: #0A0B0A; --board-2: #161917;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 17px;
+  line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  overflow-x: hidden;
+}
+.wrap { max-width: 1040px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 900; line-height: .95; text-wrap: balance; margin: 0; letter-spacing: .01em; }
+p { margin: 0; }
+.mono { font-family: var(--f-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; border-radius: 4px; }
+
+/* ---------- HERO / BOARD ---------- */
+.hero { padding-block: 40px 28px; display: grid; gap: 22px; }
+.ticketline { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); }
+.ticketline b { color: var(--ink); font-weight: 600; }
+.board {
+  background: var(--board);
+  border-radius: 14px;
+  padding: clamp(16px, 3.5vw, 32px);
+  box-shadow: var(--shadow);
+  color: var(--flap);
+  overflow: hidden;
+}
+.board-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; color: var(--amber); }
+.board-top .ru { color: #9BA39D; }
+.headline { display: grid; gap: 8px; }
+.flaprow { display: flex; flex-wrap: wrap; gap: clamp(3px, .6vw, 6px); }
+.flap {
+  font-family: var(--f-display);
+  font-weight: 900;
+  font-size: clamp(30px, 8.4vw, 86px);
+  line-height: 1;
+  width: .78em;
+  height: 1.12em;
+  display: inline-grid;
+  place-items: center;
+  background: linear-gradient(var(--board-2) 0 49%, #000 49% 51%, var(--board-2) 51%);
+  border-radius: 5px;
+  color: var(--flap);
+  font-variant-numeric: tabular-nums;
+}
+.flap.sp { background: transparent; width: .35em; }
+.flap.hot { color: var(--amber); }
+.rows { margin-top: 26px; font-family: var(--f-mono); font-size: clamp(12px, 1.9vw, 15px); border-top: 1px solid #2C302D; }
+.r { display: grid; grid-template-columns: 4.5em 1fr auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid #2C302D; }
+.r.head { color: #858C87; font-size: .8em; letter-spacing: .14em; padding: 8px 0; }
+.r .code { color: #858C87; margin-left: .6em; }
+.st { font-weight: 600; letter-spacing: .1em; padding: 2px 8px; border-radius: 3px; font-size: .85em; }
+.st.landed { color: #6FD39A; }
+.st.now { color: #121413; background: var(--amber); animation: blink 1.6s steps(2, start) infinite; }
+.st.soon { color: #FF8A98; }
+@keyframes blink { 50% { opacity: .55; } }
+.intro { max-width: 62ch; font-size: clamp(17px, 2.2vw, 20px); }
+.intro strong { font-weight: 600; }
+.langs { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--muted); font-size: 15px; }
+.langs span { white-space: nowrap; }
+
+/* ---------- ROUTE MAP ---------- */
+section { padding-block: 44px; }
+.sec-head { display: grid; gap: 8px; margin-bottom: 24px; }
+.sec-head h2 { font-size: clamp(40px, 7vw, 72px); }
+.sec-head .mono { color: var(--muted); }
+.mapcard { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: clamp(10px, 2vw, 22px); display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 20px; align-items: center; }
+.map svg { width: 100%; height: auto; display: block; }
+.map .dots { fill: var(--line); }
+.map .route { fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-dasharray: 2 7; stroke-linecap: round; opacity: .55; }
+.map .future { fill: none; stroke: var(--red); stroke-width: 2.2; stroke-dasharray: 2 9; stroke-linecap: round; opacity: .8; }
+.map .city circle.o { fill: var(--card); stroke: var(--ink); stroke-width: 2; transition: fill .3s; }
+.map .city.lit circle.o { fill: var(--green); stroke: var(--green); }
+.map .city.future-c circle.o { stroke: var(--red); }
+.map .city.future-c.lit circle.o { fill: var(--red); }
+.map .city text { font-family: var(--f-mono); font-size: 13px; fill: var(--ink); letter-spacing: .08em; }
+.map .city text.y { fill: var(--muted); font-size: 11px; }
+.map .plane path { fill: var(--red); }
+.legend { display: grid; gap: 14px; padding: 6px 8px; }
+.legend li { list-style: none; display: grid; grid-template-columns: 52px 1fr; gap: 10px; align-items: baseline; }
+.legend ol { margin: 0; padding: 0; display: grid; gap: 12px; }
+.legend .c { font-family: var(--f-mono); font-weight: 600; color: var(--green); }
+.legend .c.f { color: var(--red); }
+.legend small { color: var(--muted); display: block; font-size: 14px; }
+
+/* ---------- CHAPTERS ---------- */
+.chapter { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: clamp(20px, 4vw, 48px); align-items: start; padding-block: 52px; border-top: 1px solid var(--line); }
+.chapter.flip .text { order: 2; }
+.chapter .text { display: grid; gap: 16px; position: relative; }
+.stamp {
+  justify-self: start;
+  display: inline-grid;
+  gap: 2px;
+  text-align: center;
+  padding: 8px 14px;
+  border: 3px double var(--green);
+  color: var(--green);
+  border-radius: 8px;
+  transform: rotate(-4deg);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.stamp b { font-family: var(--f-display); font-size: 30px; letter-spacing: .04em; line-height: 1; }
+.stamp.red { border-color: var(--red); color: var(--red); transform: rotate(3deg); }
+.stamp.gold { border-color: var(--gold); color: var(--gold); transform: rotate(-2deg); }
+.chapter h3 { font-size: clamp(36px, 5.6vw, 58px); }
+.chapter p { max-width: 52ch; }
+.chapter .note { font-family: var(--f-hand); font-size: 26px; line-height: 1.15; color: var(--red); }
+.flightline { position: relative; height: 22px; border-bottom: 2px dashed var(--line); margin-top: 6px; max-width: 320px; }
+.flightline svg { position: absolute; left: 0; bottom: -10px; width: 22px; height: 22px; fill: var(--ink); transition: left 2.2s cubic-bezier(.45,0,.2,1); }
+.flightline.go svg { left: calc(100% - 22px); }
+
+.pile { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
+.pile.one { grid-template-columns: minmax(0, 1fr); max-width: 520px; }
+.polaroid {
+  margin: 0;
+  background: #FFFFFF;
+  padding: 10px 10px 8px;
+  box-shadow: var(--shadow);
+  transform: rotate(var(--r, 0deg));
+  transition: transform .25s ease;
+  position: relative;
+  cursor: zoom-in;
+  border: 0;
+  text-align: left;
+  font: inherit;
+  color: #1A1A1A;
+  width: 100%;
+}
+.polaroid:hover { transform: rotate(0deg) scale(1.02); z-index: 2; }
+.polaroid::before { content: ""; position: absolute; top: -9px; left: 50%; width: 70px; height: 20px; transform: translateX(-50%) rotate(-3deg); background: rgba(242,179,61,.55); }
+.polaroid img { display: block; width: 100%; height: auto; aspect-ratio: var(--ar, 4/3); object-fit: cover; max-width: 100%; }
+.polaroid .cap { display: block; font-family: var(--f-hand); font-weight: 500; font-size: 21px; line-height: 1.15; padding: 8px 2px 2px; color: #222; }
+.span2 { grid-column: span 2; }
+
+.ticket {
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px;
+  overflow: hidden;
+  transform: rotate(-1.2deg);
+}
+.ticket .main { padding: 20px 22px; display: grid; gap: 14px; }
+.ticket .stub { border-left: 2px dashed var(--line); padding: 20px 14px; display: grid; align-content: space-between; gap: 10px; background: color-mix(in srgb, var(--green) 8%, var(--card)); }
+.ticket .big { font-family: var(--f-display); font-size: 54px; line-height: .9; }
+.ticket .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.ticket .grid div { display: grid; gap: 2px; }
+.ticket .k { font-family: var(--f-mono); font-size: 10px; letter-spacing: .14em; color: var(--muted); text-transform: uppercase; }
+.ticket .v { font-family: var(--f-mono); font-weight: 600; font-size: 14px; }
+.barcode { height: 54px; background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 4px, var(--ink) 4px 5px, transparent 5px 9px, var(--ink) 9px 12px, transparent 12px 14px); opacity: .85; }
+.ticket.ru .stub { background: color-mix(in srgb, var(--red) 9%, var(--card)); }
+
+/* ---------- ARCHIVE ---------- */
+.archive { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; align-items: start; }
+.archive .tag { font-family: var(--f-mono); font-size: 10px; letter-spacing: .14em; color: var(--red); display: block; padding-top: 4px; }
+
+/* ---------- PASTIZZ PARTY ---------- */
+.party {
+  background: var(--board);
+  color: var(--flap);
+  border-radius: 16px;
+  padding: clamp(20px, 4vw, 44px);
+  display: grid;
+  grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+  gap: clamp(20px, 4vw, 48px);
+  align-items: center;
+  box-shadow: var(--shadow);
+}
+.card {
+  background: linear-gradient(135deg, #CF142B 0 50%, #F7F4EC 50%);
+  border-radius: 14px;
+  padding: 18px;
+  aspect-ratio: 1.586;
+  max-width: 100%;
+  color: #111;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  transform: rotate(-3deg);
+  box-shadow: 0 14px 30px rgba(0,0,0,.45);
+}
+.card .t { font-family: var(--f-display); font-size: 26px; line-height: .9; color: #F7F4EC; }
+.card .t small { display: block; font-family: var(--f-mono); font-size: 9px; letter-spacing: .16em; margin-top: 4px; }
+.card .emblem { justify-self: end; align-self: center; width: 76px; height: 76px; }
+.card .m { font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; display: flex; justify-content: space-between; gap: 8px; }
+.party h2 { font-size: clamp(44px, 7vw, 76px); color: #FFFFFF; }
+.party h2 .z { color: var(--amber); }
+.party .sub { color: #B9BFBA; margin: 10px 0 18px; max-width: 54ch; }
+.manifesto { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; counter-reset: art; }
+.manifesto li { counter-increment: art; display: grid; grid-template-columns: 74px 1fr; gap: 10px; }
+.manifesto li::before { content: "ART. " counter(art, upper-roman); font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; color: var(--amber); padding-top: 4px; }
+.fine { color: #858C87; font-size: 13px; margin-top: 18px; font-style: italic; }
+
+/* ---------- LETTER ---------- */
+.letter {
+  background: var(--card);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+  padding: clamp(24px, 5vw, 60px);
+  max-width: 760px;
+  margin: 0 auto;
+  position: relative;
+  background-image: repeating-linear-gradient(-45deg, var(--red) 0 14px, transparent 14px 28px, var(--green) 28px 42px, transparent 42px 56px);
+  background-size: 100% 8px;
+  background-repeat: no-repeat;
+  background-position: top;
+}
+.letter .airmail { font-family: var(--f-mono); font-size: 11px; letter-spacing: .2em; color: var(--muted); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 26px; }
+.letter .body { display: grid; gap: 18px; font-size: clamp(18px, 2.2vw, 20px); line-height: 1.7; max-width: 60ch; }
+.letter .hi { font-family: var(--f-hand); font-size: 40px; line-height: 1; color: var(--ink); }
+.letter .sig { font-family: var(--f-hand); font-size: 40px; line-height: 1.1; color: var(--green); }
+.letter .postmark { position: absolute; right: clamp(14px, 4vw, 40px); top: 34px; width: 92px; height: 92px; border: 2px solid var(--red); border-radius: 50%; display: grid; place-items: center; text-align: center; color: var(--red); transform: rotate(12deg); font-family: var(--f-mono); font-size: 9px; letter-spacing: .12em; line-height: 1.4; opacity: .8; }
+.letter .postmark b { font-family: var(--f-display); font-size: 22px; letter-spacing: .04em; display: block; }
+
+/* ---------- FINALE ---------- */
+.finale { text-align: center; display: grid; justify-items: center; gap: 18px; padding-block: 56px 80px; }
+.finale h2 { font-size: clamp(48px, 10vw, 110px); }
+.finale h2 .o { color: var(--red); }
+.wish {
+  font-family: var(--f-display);
+  font-weight: 900;
+  font-size: 26px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  border: 0;
+  border-radius: 999px;
+  padding: 16px 34px;
+  background: var(--green);
+  color: #FFFFFF;
+  cursor: pointer;
+  box-shadow: 0 6px 0 color-mix(in srgb, var(--green) 55%, #000);
+  transition: transform .1s, box-shadow .1s;
+}
+.wish:active { transform: translateY(4px); box-shadow: 0 2px 0 color-mix(in srgb, var(--green) 55%, #000); }
+.finale .after { min-height: 1.6em; color: var(--muted); }
+footer { border-top: 1px solid var(--line); padding-block: 22px 40px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
+canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+
+dialog#lb { border: 0; padding: 0; background: transparent; max-width: min(92vw, 1000px); max-height: 92vh; }
+dialog#lb::backdrop { background: rgba(8,10,9,.86); }
+dialog#lb img { display: block; max-width: 100%; max-height: 82vh; width: auto; height: auto; margin: 0 auto; border: 10px solid #fff; border-bottom-width: 10px; }
+dialog#lb p { font-family: var(--f-hand); font-size: 26px; color: #fff; text-align: center; margin-top: 8px; }
+dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; border: 0; border-radius: 50%; width: 36px; height: 36px; font-size: 20px; cursor: pointer; color: #111; }
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 820px) {
+  .mapcard, .chapter, .party { grid-template-columns: minmax(0, 1fr); }
+  .chapter.flip .text { order: 0; }
+  .archive { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .party .card { max-width: 320px; }
+}
+@media (max-width: 520px) {
+  .r { grid-template-columns: 3.4em 1fr auto; gap: 8px; }
+  .r .code { display: none; }
+  .ticket { grid-template-columns: minmax(0, 1fr); }
+  .ticket .stub { border-left: 0; border-top: 2px dashed var(--line); }
+  .pile { gap: 12px; }
+  .polaroid .cap { font-size: 18px; }
+  .letter .postmark { width: 72px; height: 72px; top: 22px; }
+  .letter .postmark b { font-size: 17px; }
+  .manifesto li { grid-template-columns: 1fr; gap: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="ticketline mono">
+      <span>Passenger <b>Antipov / Maxim</b></span>
+      <span>Known as <b>Max</b></span>
+      <span>Date <b>31 Oct 2026</b></span>
+      <span>Gate <b>Rome</b></span>
+    </div>
+
+    <div class="board" aria-label="Departures board">
+      <div class="board-top mono">
+        <span>Departures · Partenze</span>
+        <span class="ru">Вылет · Максим Антипов</span>
+      </div>
+      <h1 class="headline" aria-label="Happy Birthday Max">
+        <span class="flaprow" data-text="HAPPY" aria-hidden="true"></span>
+        <span class="flaprow" data-text="BIRTHDAY" aria-hidden="true"></span>
+        <span class="flaprow hot" data-text="MAX" aria-hidden="true"></span>
+      </h1>
+      <div class="rows">
+        <div class="r head"><span>YEAR</span><span>DESTINATION</span><span>STATUS</span></div>
+        <div class="r"><span>2021</span><span>MALTA<span class="code">MLA</span></span><span class="st landed">LANDED</span></div>
+        <div class="r"><span>2022</span><span>BARCELONA<span class="code">BCN</span></span><span class="st landed">LANDED</span></div>
+        <div class="r"><span>····</span><span>MILANO<span class="code">MIL</span></span><span class="st landed">LANDED</span></div>
+        <div class="r"><span>2026</span><span>ROMA<span class="code">ROM</span></span><span class="st now">NOW</span></div>
+        <div class="r"><span>TBC</span><span>МОСКВА<span class="code">MOW</span></span><span class="st soon">SOON</span></div>
+      </div>
+    </div>
+
+    <p class="intro">For <strong>Maxim Antipov</strong>, Max to everyone who matters. Lokomotiv Moscow loyalist, LUISS brain, co-founder of the PastizZ Party, and the only person I know born on Halloween who isn't remotely scary.</p>
+    <div class="langs">
+      <span>С днём рождения, Макс!</span>
+      <span>Buon compleanno!</span>
+      <span>Għeluq sninek it-tajjeb!</span>
+      <span>Lá breithe sona duit!</span>
+    </div>
+  </header>
+
+  <!-- ROUTE MAP -->
+  <section aria-labelledby="route-h">
+    <div class="sec-head">
+      <span class="mono">Flight log · 2021 → forever</span>
+      <h2 id="route-h">The route so far</h2>
+    </div>
+    <div class="mapcard">
+      <div class="map">
+        <svg id="map" viewBox="0 0 620 500" role="img" aria-label="Map of our trips: Malta, Barcelona, Milan, Rome, and someday Moscow">
+          <defs>
+            <pattern id="dotgrid" width="14" height="14" patternUnits="userSpaceOnUse"><circle class="dots" cx="2" cy="2" r="1.3"/></pattern>
+          </defs>
+          <rect width="620" height="500" fill="url(#dotgrid)"/>
+          <path id="route" class="route" d=""/>
+          <path id="future" class="future" d=""/>
+          <g id="cities"></g>
+          <g id="plane" class="plane"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z" transform="scale(1.5)"/></g>
+        </svg>
+      </div>
+      <div class="legend">
+        <ol>
+          <li><span class="c">MLA</span><span>Malta, 2021<small>Where I landed and where it all started</small></span></li>
+          <li><span class="c">BCN</span><span>Barcelona, 2022<small>The lads' trip</small></span></li>
+          <li><span class="c">MIL</span><span>Milan<small>Just the two of us</small></span></li>
+          <li><span class="c">ROM</span><span>Rome, today<small>Your city. Birthday lunch.</small></span></li>
+          <li><span class="c f">MOW</span><span>Moscow, someday<small>Booked in spirit</small></span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAPTER: MALTA -->
+  <article class="chapter" aria-labelledby="mla-h">
+    <div class="text">
+      <span class="stamp"><span>Arrived</span><b>MLA</b><span>2021</span></span>
+      <h3 id="mla-h">Malta, where it started</h3>
+      <p>I landed in Malta in 2021, and somewhere between football, nights at the national stadium and far too many pastizzi, you became one of my best friends.</p>
+      <p>Five years later I still can't fully explain how a guy from Ireland and a guy who'd die for Lokomotiv Moscow ended up this close. I'm just glad we did.</p>
+      <div class="flightline" aria-hidden="true"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></div>
+    </div>
+    <div class="pile">
+      <button class="polaroid" style="--r:-2deg" data-cap="Malta nights. Green jersey, purple hoodie, a stadium full of Irish fans."><img src="photos/tunnel.jpg" alt="Two friends smiling in a stadium tunnel at night, one in an Ireland jersey" loading="lazy"><span class="cap">Malta nights. Green jersey, purple hoodie, big smiles.</span></button>
+      <button class="polaroid" style="--r:2.5deg" data-cap="Pre-match faces. Expectations: managed."><img src="photos/stadium.jpg" alt="Two friends pulling faces in front of a floodlit football pitch" loading="lazy"><span class="cap">Pre-match faces. Expectations: managed.</span></button>
+    </div>
+  </article>
+
+  <!-- CHAPTER: BARCELONA -->
+  <article class="chapter flip" aria-labelledby="bcn-h">
+    <div class="text">
+      <span class="stamp red"><span>Arrived</span><b>BCN</b><span>2022</span></span>
+      <h3 id="bcn-h">Barcelona, four years ago</h3>
+      <p>Ryanair seats, a hotel room that turned into a wrestling ring, and the least impressed cathedral selfie in the history of Catalonia.</p>
+      <p class="note">"Barca let's go 🛵🛵" — a prophet, honestly.</p>
+      <div class="flightline" aria-hidden="true"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></div>
+    </div>
+    <div class="pile">
+      <button class="polaroid" style="--r:-2.5deg; --ar:618/1000" data-cap="Barca let's go."><img src="photos/plane.jpg" alt="Selfie of two friends on a plane captioned Barca let's go" loading="lazy"><span class="cap">Wheels up. Faces down.</span></button>
+      <button class="polaroid" style="--r:2deg; --ar:825/1000" data-cap="Hotel room diplomacy."><img src="photos/wrestle.jpg" alt="Two friends play-wrestling on a hotel bed" loading="lazy"><span class="cap">Hotel room diplomacy.</span></button>
+      <button class="polaroid span2" style="--r:-1deg" data-cap="Three men. One cathedral. Zero smiles."><img src="photos/cathedral.jpg" alt="Three friends pulling serious faces in front of Barcelona Cathedral" loading="lazy"><span class="cap">Three men. One cathedral. Zero smiles.</span></button>
+    </div>
+  </article>
+
+  <!-- CHAPTER: MILAN -->
+  <article class="chapter" aria-labelledby="mil-h">
+    <div class="text">
+      <span class="stamp gold"><span>Arrived</span><b>MIL</b><span>Duo</span></span>
+      <h3 id="mil-h">Milan, just us two</h3>
+      <p>Then the two of us went to Milan together. No group chat, no squad, just you and me wandering a city and talking for hours. It's one of my favourite memories of us.</p>
+      <div class="flightline" aria-hidden="true"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></div>
+    </div>
+    <div class="ticket" aria-label="Boarding pass to Milan">
+      <div class="main">
+        <span class="mono" style="color:var(--muted)">Boarding pass · Carta d'imbarco</span>
+        <div class="big">MIL</div>
+        <div class="grid">
+          <div><span class="k">Passengers</span><span class="v">2</span></div>
+          <div><span class="k">Class</span><span class="v">Best mates</span></div>
+          <div><span class="k">Seat</span><span class="v">Next to you</span></div>
+        </div>
+      </div>
+      <div class="stub">
+        <span class="k">Scott + Max</span>
+        <div class="barcode" aria-hidden="true"></div>
+        <span class="k">Ottimo</span>
+      </div>
+    </div>
+  </article>
+
+  <!-- CHAPTER: ROME -->
+  <article class="chapter flip" aria-labelledby="rom-h">
+    <div class="text">
+      <span class="stamp"><span>Now</span><b>ROM</b><span>31·10·26</span></span>
+      <h3 id="rom-h">Rome, right now</h3>
+      <p>You live here now and you're studying at LUISS, which surprises nobody, because you're one of the smartest people I know.</p>
+      <p>And today I'm in your city, taking you to lunch on your birthday. Not bad for two guys who met in Malta.</p>
+      <div class="flightline" aria-hidden="true"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></div>
+    </div>
+    <div class="pile one">
+      <button class="polaroid" style="--r:1.5deg" data-cap="One of us was excited about the chicken. One of us was not."><img src="photos/nandos.jpg" alt="Two friends at a restaurant table, one frowning and one grinning, with chicken and chips" loading="lazy"><span class="cap">Lunch preview. One of us was excited about the chicken.</span></button>
+    </div>
+  </article>
+
+  <!-- CHAPTER: MOSCOW -->
+  <article class="chapter" aria-labelledby="mow-h">
+    <div class="text">
+      <span class="stamp red"><span>Pending</span><b>MOW</b><span>TBC</span></span>
+      <h3 id="mow-h">Moscow, someday</h3>
+      <p>One day I'm coming to Russia. You show me Moscow, we go to a Lokomotiv game at the RZD Arena, and I pretend I understand the chants. That's a promise.</p>
+      <p class="note">Вперёд, Локомотив!</p>
+    </div>
+    <div class="ticket ru" aria-label="Open boarding pass to Moscow">
+      <div class="main">
+        <span class="mono" style="color:var(--muted)">Open ticket · Посадочный талон</span>
+        <div class="big" style="color:var(--red)">MOW</div>
+        <div class="grid">
+          <div><span class="k">Date</span><span class="v">TBC</span></div>
+          <div><span class="k">Guide</span><span class="v">Max</span></div>
+          <div><span class="k">Kit</span><span class="v">Red + green</span></div>
+        </div>
+      </div>
+      <div class="stub">
+        <span class="k">Valid forever</span>
+        <div class="barcode" aria-hidden="true"></div>
+        <span class="k">Non-refundable</span>
+      </div>
+    </div>
+  </article>
+
+  <!-- ARCHIVE -->
+  <section aria-labelledby="arc-h" style="border-top:1px solid var(--line)">
+    <div class="sec-head">
+      <span class="mono">Evidence locker · Do not distribute (too late)</span>
+      <h2 id="arc-h">Declassified files</h2>
+    </div>
+    <div class="archive">
+      <button class="polaroid" style="--r:-3deg; --ar:3/4" data-cap="No explanation will be given at this time."><img src="photos/towel.jpg" alt="Two friends pouting, one wearing a hoodie wrapped on his head" loading="lazy"><span class="cap">No explanation will be given at this time.</span><span class="tag">FILE 001</span></button>
+      <button class="polaroid" style="--r:2deg; --ar:618/1100" data-cap="&quot;like da flex?&quot; Yes. Obviously."><img src="photos/mirror.jpg" alt="Mirror selfie screenshot captioned like da flex" loading="lazy"><span class="cap">"like da flex?" Yes. Obviously.</span><span class="tag">FILE 002</span></button>
+      <button class="polaroid" style="--r:-1.5deg" data-cap="The squad. Fists clenched, egos larger."><img src="photos/squad.jpg" alt="Group of friends in football shirts on a pitch" loading="lazy"><span class="cap">The squad. Two Arsenal shirts, one Celtic. Unacceptable.</span><span class="tag">FILE 003</span></button>
+    </div>
+  </section>
+
+  <!-- PASTIZZ PARTY -->
+  <section aria-labelledby="pp-h">
+    <div class="party">
+      <div class="card" aria-label="PastizZ Party membership card">
+        <div class="t">PASTIZZ<br>PARTY<small>FOUNDING MEMBERS</small></div>
+        <svg class="emblem" viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M50 8 L92 50 L50 92 L8 50 Z" fill="#E2A33A" stroke="#8A5A12" stroke-width="3"/>
+          <path d="M50 18 L82 50 L50 82 L18 50 Z" fill="none" stroke="#B9791C" stroke-width="2.5"/>
+          <path d="M50 30 L70 50 L50 70 L30 50 Z" fill="none" stroke="#B9791C" stroke-width="2.5"/>
+          <path d="M8 50 L92 50" stroke="#8A5A12" stroke-width="2"/>
+        </svg>
+        <div class="m"><span>No. 001 · MAX</span><span>No. 002 · SCOTT</span></div>
+      </div>
+      <div>
+        <h2 id="pp-h">PastizZ Party<span class="z">.</span></h2>
+        <p class="sub">The official, entirely hypothetical movement for Maltese global domination. Founded in Malta. Headquartered wherever the two of us happen to be.</p>
+        <ol class="manifesto">
+          <li>Every citizen of Earth receives two pastizzi a day, one ricotta and one pea. No exceptions.</li>
+          <li>Valletta becomes capital of the world. Rome may keep its title as a hobby.</li>
+          <li>Lokomotiv Moscow are granted honorary Maltese status and a guaranteed Champions League spot.</li>
+          <li>Comrade Max is appointed Minister for Being Annoyingly Smart.</li>
+          <li>Comrade Scott is appointed Minister for Irish Affairs and Overly Long Birthday Websites.</li>
+        </ol>
+        <p class="fine">Satire. Nobody is annexing anything, except possibly the last pastizz.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LETTER -->
+  <section aria-labelledby="letter-h">
+    <h2 id="letter-h" class="mono" style="font-family:var(--f-mono);font-weight:600;font-size:12px;color:var(--muted);text-align:center;margin-bottom:18px">The actual message</h2>
+    <div class="letter">
+      <div class="postmark" aria-hidden="true"><div>ROMA<b>31 OCT</b>2026</div></div>
+      <div class="airmail"><span>Par avion · Airmail · To: Max</span></div>
+      <div class="body">
+        <p class="hi">Max,</p>
+        <p>Happy birthday man. I wanted to give you something a bit better than a text, so here we are.</p>
+        <p>Since I landed in Malta in 2021, you've been one of my best friends. Barcelona, Milan, the football, the stupid nights, all of it. And now I'm sitting in Rome, the city you call home, about to take you to lunch on your birthday. When I think about where we started, that's pretty special.</p>
+        <p>We don't talk all the time, and we don't need to. Our friendship has never needed to be constant. We can go weeks without speaking and pick up exactly where we left off, and to me that's the best kind of friendship there is.</p>
+        <p>You're one of the smartest people I know, and somehow one of the kindest too. You're a genuinely good person, Max. I'm proud of you and everything you're doing, and I'm really lucky to have you as a mate.</p>
+        <p>I love you, brother. Here's to another year, and to Moscow next.</p>
+        <p class="sig">Scott</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINALE -->
+  <section class="finale" aria-labelledby="fin-h">
+    <span class="mono" style="color:var(--muted)">Final call for passenger Antipov</span>
+    <h2 id="fin-h">Happy birthday,<br><span class="o">Max.</span></h2>
+    <button class="wish" id="wish" type="button">Make a wish</button>
+    <p class="after" id="after" aria-live="polite"></p>
+  </section>
+
+  <footer class="mono">
+    <span>Made with love by Scott, the Irish one</span>
+    <span>Roma · 31.10.2026</span>
+  </footer>
+</div>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+<dialog id="lb" aria-label="Photo">
+  <button type="button" id="lbclose" aria-label="Close">×</button>
+  <img id="lbimg" alt="">
+  <p id="lbcap"></p>
+</dialog>
+
+<script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- split-flap headline ---- */
+  var CH = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  var rows = document.querySelectorAll('.flaprow');
+  var flaps = [];
+  rows.forEach(function (row) {
+    var hot = row.classList.contains('hot');
+    row.dataset.text.split('').forEach(function (c) {
+      var s = document.createElement('span');
+      s.className = 'flap' + (c === ' ' ? ' sp' : '') + (hot ? ' hot' : '');
+      s.textContent = c;
+      row.appendChild(s);
+      if (c !== ' ') flaps.push({ el: s, final: c });
+    });
+  });
+  function shuffle() {
+    flaps.forEach(function (f, i) {
+      var n = 6 + Math.floor(i * 1.3) + Math.floor(Math.random() * 6), k = 0;
+      var t = setInterval(function () {
+        if (k++ >= n) { f.el.textContent = f.final; clearInterval(t); return; }
+        f.el.textContent = CH[Math.floor(Math.random() * CH.length)];
+      }, 55);
+    });
+  }
+  if (!reduce) setTimeout(shuffle, 250);
+  document.querySelector('.board').addEventListener('click', function () { if (!reduce) shuffle(); });
+
+  /* ---- route map ---- */
+  var P = function (lon, lat) { return [(lon + 2) * 14, (58 - lat) * 20]; };
+  var cities = [
+    { code: 'MLA', name: 'MALTA', y: '2021', p: P(14.51, 35.9), dx: 12, dy: 5 },
+    { code: 'BCN', name: 'BARCELONA', y: '2022', p: P(2.17, 41.39), dx: -6, dy: 26, anchor: 'start' },
+    { code: 'MIL', name: 'MILANO', y: 'DUO', p: P(9.19, 45.46), dx: -12, dy: -12, anchor: 'end' },
+    { code: 'ROM', name: 'ROMA', y: 'NOW', p: P(12.5, 41.9), dx: 13, dy: 4 },
+    { code: 'MOW', name: 'МОСКВА', y: 'SOMEDAY', p: P(37.6, 55.75), dx: -14, dy: 4, anchor: 'end', future: true }
+  ];
+  function curve(a, b, bend) {
+    var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+    var dx = b[0] - a[0], dy = b[1] - a[1];
+    var cx = mx - dy * bend, cy = my + dx * bend;
+    return 'Q' + cx.toFixed(1) + ',' + cy.toFixed(1) + ' ' + b[0].toFixed(1) + ',' + b[1].toFixed(1);
+  }
+  var d = 'M' + cities[0].p.join(',');
+  for (var i = 1; i < 4; i++) d += ' ' + curve(cities[i - 1].p, cities[i].p, i % 2 ? .28 : -.28);
+  var route = document.getElementById('route');
+  route.setAttribute('d', d);
+  var future = document.getElementById('future');
+  future.setAttribute('d', 'M' + cities[3].p.join(',') + ' ' + curve(cities[3].p, cities[4].p, .22));
+
+  var g = document.getElementById('cities'), ns = 'http://www.w3.org/2000/svg';
+  cities.forEach(function (c) {
+    var grp = document.createElementNS(ns, 'g');
+    grp.setAttribute('class', 'city' + (c.future ? ' future-c' : ''));
+    var o = document.createElementNS(ns, 'circle');
+    o.setAttribute('class', 'o'); o.setAttribute('cx', c.p[0]); o.setAttribute('cy', c.p[1]); o.setAttribute('r', 7);
+    var t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', c.p[0] + c.dx); t.setAttribute('y', c.p[1] + c.dy);
+    t.setAttribute('text-anchor', c.anchor || 'start'); t.textContent = c.name;
+    var y = document.createElementNS(ns, 'text');
+    y.setAttribute('class', 'y'); y.setAttribute('x', c.p[0] + c.dx); y.setAttribute('y', c.p[1] + c.dy + 14);
+    y.setAttribute('text-anchor', c.anchor || 'start'); y.textContent = c.y;
+    grp.appendChild(o); grp.appendChild(t); grp.appendChild(y);
+    g.appendChild(grp); c.el = grp;
+  });
+
+  var plane = document.getElementById('plane');
+  var L1 = route.getTotalLength(), L2 = future.getTotalLength();
+  // arc-length position of each city along the main route
+  var stops = [0];
+  (function () {
+    var acc = 0, last = cities[0].p, step = 2, seg = 1;
+    for (var s = 0; s <= L1 && seg < 4; s += step) {
+      var pt = route.getPointAtLength(s);
+      if (Math.hypot(pt.x - cities[seg].p[0], pt.y - cities[seg].p[1]) < 2.5) { stops.push(s); seg++; }
+    }
+    while (stops.length < 4) stops.push(L1);
+  })();
+  function place(path, len, s) {
+    var a = path.getPointAtLength(Math.max(0, s - 1)), b = path.getPointAtLength(Math.min(len, s + 1));
+    var ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+    var p = path.getPointAtLength(s);
+    plane.setAttribute('transform', 'translate(' + p.x.toFixed(1) + ',' + p.y.toFixed(1) + ') rotate(' + ang.toFixed(1) + ')');
+  }
+  function light(n) { cities.forEach(function (c, i) { c.el.classList.toggle('lit', i <= n); }); }
+
+  if (reduce) {
+    place(route, L1, L1); light(3);
+  } else {
+    var SPEED = 70, PAUSE = 900, t0 = null, phase = 0, from = 0, waitUntil = 0;
+    // phases: 0..2 fly main legs, 3 fly future leg, 4 pause and reset
+    light(0); place(route, L1, 0);
+    var tick = function (now) {
+      if (t0 === null) t0 = now;
+      if (now < waitUntil) { requestAnimationFrame(tick); return; }
+      var dt = (now - t0) / 1000; t0 = now;
+      if (phase < 3) {
+        from += SPEED * dt;
+        var target = stops[phase + 1];
+        if (from >= target) { from = target; phase++; light(phase); waitUntil = now + PAUSE; t0 = null; }
+        place(route, L1, from);
+      } else if (phase === 3) {
+        from += SPEED * .6 * dt;
+        var s = from - L1;
+        if (s >= L2) { place(future, L2, L2); light(4); phase = 4; waitUntil = now + PAUSE * 2.5; t0 = null; }
+        else place(future, L2, Math.max(0, s));
+      } else {
+        phase = 0; from = 0; light(0); place(route, L1, 0); waitUntil = now + PAUSE; t0 = null;
+      }
+      requestAnimationFrame(tick);
+    };
+    setTimeout(function () { requestAnimationFrame(tick); }, 1200);
+  }
+
+  /* ---- chapter flight lines ---- */
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('go'); io.unobserve(e.target); } });
+    }, { threshold: .6 });
+    document.querySelectorAll('.flightline').forEach(function (el) { io.observe(el); });
+  }
+
+  /* ---- lightbox ---- */
+  var lb = document.getElementById('lb'), lbimg = document.getElementById('lbimg'), lbcap = document.getElementById('lbcap');
+  document.querySelectorAll('.polaroid').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var img = b.querySelector('img');
+      lbimg.src = img.src; lbimg.alt = img.alt; lbcap.textContent = b.dataset.cap || '';
+      if (lb.showModal) lb.showModal();
+    });
+  });
+  document.getElementById('lbclose').addEventListener('click', function () { lb.close(); });
+  lb.addEventListener('click', function (e) { if (e.target === lb) lb.close(); });
+
+  /* ---- confetti (pastizzi diamonds) ---- */
+  var cv = document.getElementById('confetti'), cx = cv.getContext('2d'), bits = [], running = false;
+  function size() { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; }
+  size(); addEventListener('resize', size);
+  var COLORS = ['#C8102E', '#0B6B39', '#E2A33A', '#F3E9CC', '#43BE7A', '#F0566A'];
+  function burst() {
+    var W = cv.width, H = cv.height, n = reduce ? 40 : 180;
+    for (var i = 0; i < n; i++) {
+      bits.push({
+        x: W / 2 + (Math.random() - .5) * W * .3, y: H * .75,
+        vx: (Math.random() - .5) * 18 * devicePixelRatio, vy: -(10 + Math.random() * 16) * devicePixelRatio,
+        s: (6 + Math.random() * 10) * devicePixelRatio, r: Math.random() * 6, vr: (Math.random() - .5) * .3,
+        c: COLORS[i % COLORS.length], life: 0
+      });
+    }
+    if (!running) { running = true; requestAnimationFrame(frame); }
+  }
+  function frame() {
+    cx.clearRect(0, 0, cv.width, cv.height);
+    bits.forEach(function (b) {
+      b.vy += .45 * devicePixelRatio; b.vx *= .99; b.x += b.vx; b.y += b.vy; b.r += b.vr; b.life++;
+      cx.save(); cx.translate(b.x, b.y); cx.rotate(b.r); cx.fillStyle = b.c;
+      cx.beginPath(); cx.moveTo(0, -b.s / 2); cx.lineTo(b.s / 2.6, 0); cx.lineTo(0, b.s / 2); cx.lineTo(-b.s / 2.6, 0); cx.closePath(); cx.fill();
+      cx.restore();
+    });
+    bits = bits.filter(function (b) { return b.y < cv.height + 40 && b.life < 400; });
+    if (bits.length) requestAnimationFrame(frame); else { running = false; cx.clearRect(0, 0, cv.width, cv.height); }
+  }
+  var lines = [
+    'Wish received. Processing in Moscow.',
+    'The PastizZ Party approves this wish.',
+    'Another one? Greedy. Fine.',
+    'Lokomotiv win the league. Noted.',
+    'Wish granted. Probably.'
+  ], w = 0;
+  document.getElementById('wish').addEventListener('click', function () {
+    burst();
+    document.getElementById('after').textContent = lines[w++ % lines.length];
+  });
+})();
+</script>
+
+</body>
+</html>
