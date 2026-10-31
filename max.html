@@ -4,20 +4,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=IM+Fell+English:ital@0;1&family=Caveat:wght@500;700&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:ital,wght@0,400;0,600;1,400&display=swap">
 <style>
-/* Layout: a full-screen story player. Each scene is one stop on a flight log (departures board → Malta → history class → trips → Dublin/Rome → treaty → letter → finale) and advances on its own. Single committed dark "night flight" look. */
+/* Layout: a full-screen story player. Each scene is a bright, solid-colour "story card" (Mediterranean sky, Halloween orange, Milan red, Irish green...) that advances on its own. Objects inside (the departures board, polaroids, exam paper, treaty, letter) keep their own real-world colours. Single committed look, independent of the viewer's theme. */
 :root {
-  --bg: #0E1411;
-  --bg-2: #151D19;
-  --ink: #EEF1EA;
-  --muted: #9AA8A0;
-  --line: #2C3832;
-  --red: #E5384F;
-  --green: #2FAE68;
-  --gold: #E9B14E;
-  --amber: #F2B33D;
+  --ink: #141414;
+  --paper: #FFFFFF;
   --board: #0A0B0A;
   --board-2: #1A1D1B;
   --flap: #F3E9CC;
+  --amber: #F2B33D;
+  --red: #E63946;
+  --green: #169B62;
   --parch: #F6EED9;
   --parch-ink: #2A2216;
   --exam: #FBFBF7;
@@ -28,41 +24,62 @@
   --f-hand: "Caveat", "Segoe Print", "Bradley Hand", cursive;
   --f-old: "IM Fell English", Georgia, "Times New Roman", serif;
   --vh: 1vh;
-  color-scheme: dark;
+  color-scheme: light;
 }
 @supports (height: 1dvh) { :root { --vh: 1dvh; } }
 
+/* scene colour themes */
+.t-sky    { --bg-s: #4DB8FF; --fg: #06233B; --acc: #A3001B; }
+.t-orange { --bg-s: #FF8A2B; --fg: #241000; --acc: #7A1200; }
+.t-cream  { --bg-s: #FFF1D6; --fg: #1B1B1B; --acc: #169B62; }
+.t-pink   { --bg-s: #FF9EB8; --fg: #2B0613; --acc: #8A0030; }
+.t-lime   { --bg-s: #43D17F; --fg: #052814; --acc: #0B3D91; }
+.t-coral  { --bg-s: #FF6F59; --fg: #2A0703; --acc: #5A0A00; }
+.t-milan  { --bg-s: #E1251B; --fg: #FFFFFF; --acc: #111111; }
+.t-yellow { --bg-s: #FFD23F; --fg: #1F1500; --acc: #C1121F; }
+.t-green  { --bg-s: #169B62; --fg: #FFFFFF; --acc: #FFD8A8; }
+.t-snow   { --bg-s: #DCEBFF; --fg: #0E1B33; --acc: #C1121F; }
+.t-lilac  { --bg-s: #C9B8FF; --fg: #1A0F3D; --acc: #B0101C; }
+.t-red    { --bg-s: #E63946; --fg: #FFFFFF; --acc: #FFE066; }
+.t-blue   { --bg-s: #2D6BE4; --fg: #FFFFFF; --acc: #FFE066; }
+.t-mint   { --bg-s: #BFF0D4; --fg: #0F2A1C; --acc: #169B62; }
+.t-peach  { --bg-s: #FFD8B5; --fg: #2A1406; --acc: #B0101C; }
+.t-pale   { --bg-s: #BFE3FF; --fg: #0B2338; --acc: #B0101C; }
+
 * { box-sizing: border-box; }
 html, body { height: 100%; }
-body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.5; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+body { background: #4DB8FF; color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.5; overflow: hidden; -webkit-tap-highlight-color: transparent; }
 h1, h2, h3 { font-family: var(--f-display); font-weight: 900; line-height: .95; margin: 0; text-wrap: balance; letter-spacing: .01em; }
 p { margin: 0; }
 .mono { font-family: var(--f-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
-:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; border-radius: 4px; }
+:focus-visible { outline: 3px solid #111; outline-offset: 3px; border-radius: 4px; }
 
 /* ---------- STAGE ---------- */
 .stage { position: fixed; inset: 0; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
 .scene {
+  --mut: color-mix(in srgb, var(--fg) 72%, transparent);
   position: absolute; inset: 0;
   display: flex; flex-direction: column; align-items: center;
   padding-top: calc(env(safe-area-inset-top, 0px) + 40px);
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 64px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 66px);
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   opacity: 0; visibility: hidden;
-  transition: opacity .6s ease, visibility 0s linear .6s;
-  background: radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--glow, var(--green)) 22%, transparent), transparent 60%), var(--bg);
+  transition: opacity .5s ease, visibility 0s linear .5s;
+  background: radial-gradient(90% 60% at 85% 0%, rgba(255,255,255,.28), transparent 60%), radial-gradient(70% 50% at 0% 100%, rgba(0,0,0,.08), transparent 60%), var(--bg-s);
+  color: var(--fg);
   overflow-y: auto;
 }
-.scene.active { opacity: 1; visibility: visible; transition: opacity .6s ease, visibility 0s; z-index: 1; }
-.sc { width: 100%; max-width: 1040px; margin-block: auto; flex-shrink: 0; display: grid; gap: clamp(14px, calc(var(--vh) * 2.6), 28px); align-content: center; min-height: 0; }
+.scene.t-milan { background: repeating-linear-gradient(90deg, rgba(0,0,0,.0) 0 70px, rgba(0,0,0,.14) 70px 140px), var(--bg-s); }
+.scene.active { opacity: 1; visibility: visible; transition: opacity .5s ease, visibility 0s; z-index: 1; }
+.sc { width: 100%; max-width: 1040px; margin-block: auto; flex-shrink: 0; display: grid; gap: clamp(14px, calc(var(--vh) * 2.6), 28px); align-content: center; }
 .split { display: grid; gap: clamp(14px, calc(var(--vh) * 2.6), 28px); }
 .txt { display: grid; gap: clamp(8px, calc(var(--vh) * 1.6), 16px); min-width: 0; }
-.big { font-size: clamp(36px, min(11vw, calc(var(--vh) * 7.2)), 88px); }
-.mid { font-size: clamp(30px, min(9vw, calc(var(--vh) * 5.6)), 66px); }
-.lede { font-size: clamp(16px, min(4.4vw, calc(var(--vh) * 2.5)), 21px); max-width: 52ch; color: var(--ink); }
-.lede.dim { color: var(--muted); }
-.note { font-family: var(--f-hand); font-size: clamp(22px, min(6vw, calc(var(--vh) * 3.4)), 32px); line-height: 1.1; color: var(--gold); }
+.big { font-size: clamp(40px, min(12vw, calc(var(--vh) * 7.6)), 96px); }
+.mid { font-size: clamp(32px, min(9.6vw, calc(var(--vh) * 6)), 72px); }
+.lede { font-size: clamp(16px, min(4.5vw, calc(var(--vh) * 2.6)), 22px); max-width: 50ch; }
+.lede.dim, .mut { color: var(--mut); }
+.note { font-family: var(--f-hand); font-weight: 700; font-size: clamp(24px, min(6.4vw, calc(var(--vh) * 3.6)), 34px); line-height: 1.1; color: var(--acc); }
 .center { text-align: center; justify-items: center; }
 
 @media (min-aspect-ratio: 5/4) and (min-width: 760px) {
@@ -70,8 +87,7 @@ p { margin: 0; }
   .split.rev > :first-child { order: 2; }
 }
 
-/* entrance animations: replay every time a scene becomes active */
-.in { opacity: 1; }
+/* entrance animations, replayed every time a scene becomes active */
 .scene.active .in { animation: rise .8s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
 .scene.active .pop { animation: pop .7s cubic-bezier(.2,1.4,.4,1) both; animation-delay: var(--d, 0s); }
 .scene.active .slam { animation: slam .45s cubic-bezier(.3,1.6,.5,1) both; animation-delay: var(--d, 0s); }
@@ -80,24 +96,26 @@ p { margin: 0; }
 @keyframes slam { from { opacity: 0; transform: scale(2.6) rotate(-14deg); } to { opacity: 1; transform: rotate(-10deg); } }
 .stage.paused .scene.active *, .stage.paused .scene.active { animation-play-state: paused !important; }
 
-/* ---------- CHROME: progress, controls ---------- */
+/* ---------- CHROME ---------- */
 .bars { position: fixed; z-index: 5; left: 0; right: 0; top: 0; display: flex; gap: 4px; padding-top: calc(env(safe-area-inset-top, 0px) + 10px); padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); pointer-events: none; transition: opacity .4s; }
-.bars i { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,.22); overflow: hidden; display: block; }
-.bars i b { display: block; height: 100%; width: 0; background: #fff; }
+.bars i { flex: 1; height: 3px; border-radius: 2px; background: rgba(0,0,0,.18); overflow: hidden; display: block; }
+.bars i b { display: block; height: 100%; width: 0; background: rgba(0,0,0,.75); }
+body.fgw .bars i { background: rgba(255,255,255,.3); }
+body.fgw .bars i b { background: #fff; }
 .ctrls { position: fixed; z-index: 5; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); padding-left: max(14px, env(safe-area-inset-left, 0px)); padding-right: max(14px, env(safe-area-inset-right, 0px)); pointer-events: none; transition: opacity .4s; }
 .ctrls > div { display: flex; gap: 8px; pointer-events: auto; }
-.cb { width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(255,255,255,.18); background: rgba(10,12,11,.55); color: #fff; display: grid; place-items: center; cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 0; }
+.cb { width: 42px; height: 42px; border-radius: 50%; border: 0; background: rgba(20,20,20,.78); color: #fff; display: grid; place-items: center; cursor: pointer; padding: 0; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
 .cb svg { width: 18px; height: 18px; fill: currentColor; }
-.cb:hover { background: rgba(40,48,44,.75); }
-.stage.pre ~ .bars, .stage.pre ~ .ctrls { opacity: 0; pointer-events: none; }
+.cb:hover { background: #000; }
+.stage.pre ~ .bars, .stage.pre ~ .ctrls { opacity: 0; }
 .stage.pre ~ .ctrls > div { pointer-events: none; }
-.hint { position: fixed; z-index: 6; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 70px); transform: translateX(-50%); background: rgba(10,12,11,.8); border: 1px solid rgba(255,255,255,.15); padding: 8px 14px; border-radius: 999px; color: var(--muted); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .5s; }
+.hint { position: fixed; z-index: 6; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 70px); transform: translateX(-50%); background: rgba(20,20,20,.85); padding: 8px 14px; border-radius: 999px; color: #fff; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .5s; }
 .hint.show { opacity: 1; }
-.pausedtag { position: fixed; z-index: 6; top: calc(env(safe-area-inset-top, 0px) + 26px); left: 50%; transform: translateX(-50%); color: #fff; background: rgba(10,12,11,.7); padding: 4px 12px; border-radius: 999px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.pausedtag { position: fixed; z-index: 6; top: calc(env(safe-area-inset-top, 0px) + 24px); left: 50%; transform: translateX(-50%); color: #fff; background: rgba(20,20,20,.85); padding: 4px 12px; border-radius: 999px; opacity: 0; transition: opacity .2s; pointer-events: none; }
 .stage.paused ~ .pausedtag { opacity: 1; }
 
-/* ---------- BOARD (start) ---------- */
-.board { background: var(--board); border: 1px solid #222624; border-radius: 14px; padding: clamp(14px, 3vw, 28px); color: var(--flap); width: 100%; max-width: 760px; justify-self: center; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+/* ---------- BOARD ---------- */
+.board { background: var(--board); border-radius: 14px; padding: clamp(14px, 3vw, 28px); color: var(--flap); width: 100%; max-width: 760px; justify-self: center; box-shadow: 0 24px 50px rgba(6,35,59,.35); text-align: left; }
 .board-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; color: var(--amber); }
 .board-top .ru { color: #9BA39D; }
 .headline { display: grid; gap: 6px; }
@@ -109,76 +127,74 @@ p { margin: 0; }
 .r.head { color: #858C87; font-size: .8em; letter-spacing: .14em; }
 .st { font-weight: 600; letter-spacing: .1em; padding: 2px 7px; border-radius: 3px; font-size: .85em; }
 .st.landed { color: #6FD39A; }
+.st.home { color: #121413; background: #6FD39A; }
 .st.now { color: #121413; background: var(--amber); animation: blink 1.6s steps(2, start) infinite; }
 .st.soon { color: #FF8A98; }
 @keyframes blink { 50% { opacity: .55; } }
-.ticketline { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; color: var(--muted); }
-.ticketline b { color: var(--ink); font-weight: 600; }
-.play { font-family: var(--f-display); font-weight: 900; font-size: 26px; letter-spacing: .05em; text-transform: uppercase; border: 0; border-radius: 999px; padding: 14px 34px 14px 28px; background: var(--amber); color: #121413; cursor: pointer; display: inline-flex; align-items: center; gap: 12px; box-shadow: 0 0 0 0 rgba(242,179,61,.6); animation: pulse 2s infinite; justify-self: center; }
+.ticketline { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; color: var(--mut); }
+.ticketline b { color: var(--fg); font-weight: 600; }
+.play { font-family: var(--f-display); font-weight: 900; font-size: 26px; letter-spacing: .05em; text-transform: uppercase; border: 0; border-radius: 999px; padding: 14px 34px 14px 28px; background: #FFD23F; color: #1F1500; cursor: pointer; display: inline-flex; align-items: center; gap: 12px; box-shadow: 0 6px 0 #C79A00; animation: bob 1.8s ease-in-out infinite; justify-self: center; }
+.play:active { transform: translateY(4px); box-shadow: 0 2px 0 #C79A00; }
 .play svg { width: 20px; height: 20px; fill: currentColor; }
-@keyframes pulse { 70% { box-shadow: 0 0 0 18px rgba(242,179,61,0); } 100% { box-shadow: 0 0 0 0 rgba(242,179,61,0); } }
-.small { color: var(--muted); font-size: 13px; }
+@keyframes bob { 50% { transform: translateY(-4px); } }
+.small { color: var(--mut); font-size: 14px; }
 
 /* ---------- FLIGHT STRIP ---------- */
 .strip { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; font-family: var(--f-mono); font-weight: 600; font-size: 14px; letter-spacing: .1em; max-width: 420px; width: 100%; }
-.strip .ln { position: relative; height: 2px; background: repeating-linear-gradient(90deg, var(--muted) 0 6px, transparent 6px 12px); }
-.strip svg { position: absolute; top: -10px; left: calc(100% - 22px); width: 22px; height: 22px; fill: var(--red); }
+.strip .ln { position: relative; height: 2px; background: repeating-linear-gradient(90deg, var(--fg) 0 6px, transparent 6px 12px); opacity: .8; }
+.strip svg { position: absolute; top: -10px; left: calc(100% - 22px); width: 22px; height: 22px; fill: var(--fg); }
 .scene.active .strip svg { animation: fly 2.4s cubic-bezier(.5,0,.2,1) .3s both; }
 @keyframes fly { from { left: 0; } to { left: calc(100% - 22px); } }
-.strip .sub { grid-column: 1 / -1; font-weight: 400; color: var(--muted); font-size: 11px; }
+.strip .sub { grid-column: 1 / -1; font-weight: 400; color: var(--mut); font-size: 11px; }
 
 /* ---------- STAMPS ---------- */
-.stamp { justify-self: start; display: inline-grid; gap: 1px; text-align: center; padding: 6px 12px; border: 3px double var(--green); color: var(--green); border-radius: 8px; transform: rotate(-4deg); font-family: var(--f-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
+.stamp { justify-self: start; display: inline-grid; gap: 1px; text-align: center; padding: 6px 12px; border: 3px double var(--fg); color: var(--fg); border-radius: 8px; transform: rotate(-4deg); font-family: var(--f-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
 .stamp b { font-family: var(--f-display); font-size: 26px; letter-spacing: .04em; line-height: 1; }
-.stamp.red { border-color: var(--red); color: var(--red); transform: rotate(3deg); }
-.stamp.gold { border-color: var(--gold); color: var(--gold); }
 
 /* ---------- POLAROIDS ---------- */
 .pile { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(10px, 2vw, 18px); align-items: start; width: 100%; }
 .pile.one { grid-template-columns: minmax(0, 1fr); max-width: 560px; justify-self: center; }
-.polaroid { margin: 0; background: #fff; padding: 8px 8px 6px; box-shadow: 0 10px 30px rgba(0,0,0,.45); transform: rotate(var(--r, 0deg)); position: relative; color: #1a1a1a; min-width: 0; }
-.polaroid::before { content: ""; position: absolute; top: -8px; left: 50%; width: 60px; height: 18px; transform: translateX(-50%) rotate(-3deg); background: rgba(242,179,61,.6); }
+.polaroid { margin: 0; background: #fff; padding: 8px 8px 6px; box-shadow: 0 12px 28px rgba(0,0,0,.25); transform: rotate(var(--r, 0deg)); position: relative; color: #1a1a1a; min-width: 0; }
+.polaroid::before { content: ""; position: absolute; top: -8px; left: 50%; width: 60px; height: 18px; transform: translateX(-50%) rotate(-3deg); background: rgba(255,255,255,.65); box-shadow: 0 1px 2px rgba(0,0,0,.1); }
 .polaroid img { display: block; width: 100%; height: var(--h, calc(var(--vh) * 22)); object-fit: cover; object-position: var(--pos, center); max-width: 100%; }
-.polaroid figcaption { font-family: var(--f-hand); font-weight: 500; font-size: clamp(16px, min(4.4vw, calc(var(--vh) * 2.4)), 21px); line-height: 1.1; padding: 6px 2px 2px; color: #222; }
+.polaroid figcaption { font-family: var(--f-hand); font-weight: 500; font-size: clamp(17px, min(4.6vw, calc(var(--vh) * 2.5)), 22px); line-height: 1.1; padding: 6px 2px 2px; color: #222; }
 .span2 { grid-column: span 2; }
 .h-one { --h: calc(var(--vh) * 36); }
-.pair .polaroid { --h: calc(var(--vh) * 26); }
 .h-tall { --h: calc(var(--vh) * 34); }
 .h-row { --h: calc(var(--vh) * 19); }
+.pair .polaroid { --h: calc(var(--vh) * 27); }
 @media (min-aspect-ratio: 5/4) and (min-width: 760px) {
   .h-one { --h: calc(var(--vh) * 54); }
-  .h-tall { --h: calc(var(--vh) * 52); }
-  .h-row { --h: calc(var(--vh) * 27); }
-  .pair .polaroid { --h: calc(var(--vh) * 46); }
+  .h-tall { --h: calc(var(--vh) * 50); }
+  .h-row { --h: calc(var(--vh) * 26); }
+  .pair .polaroid { --h: calc(var(--vh) * 48); }
 }
 
 /* ---------- MAP ---------- */
 .map svg { width: 100%; height: auto; max-height: calc(var(--vh) * 46); display: block; margin: 0 auto; }
-.map .dots { fill: #26312B; }
-.map .route { fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-dasharray: 2 7; stroke-linecap: round; opacity: .55; }
-.map .future { fill: none; stroke: var(--red); stroke-width: 2.2; stroke-dasharray: 2 9; stroke-linecap: round; }
-.map .tether { fill: none; stroke: var(--green); stroke-width: 1.6; stroke-dasharray: 6 5; opacity: .75; }
-.map .tether-label { font-family: var(--f-mono); font-size: 12px; fill: var(--green); letter-spacing: .06em; }
-.map .city circle.o { fill: var(--bg); stroke: var(--ink); stroke-width: 2; transition: fill .3s, stroke .3s; }
+.map .dots { fill: rgba(0,0,0,.12); }
+.map .leg { fill: none; stroke: var(--fg); stroke-width: 2.2; stroke-dasharray: 2 7; stroke-linecap: round; opacity: .6; }
+.map .leg.future { stroke: #D7263D; opacity: 1; stroke-dasharray: 2 9; }
+.map .tether { fill: none; stroke: var(--green); stroke-width: 1.8; stroke-dasharray: 6 5; }
+.map .tether-label { font-family: var(--f-mono); font-size: 12px; font-weight: 600; fill: var(--green); letter-spacing: .06em; }
+.map .city circle.o { fill: var(--bg-s); stroke: var(--fg); stroke-width: 2; transition: fill .3s, stroke .3s; }
 .map .city.lit circle.o, .map .city.home circle.o { fill: var(--green); stroke: var(--green); }
-.map .city.future-c circle.o { stroke: var(--red); }
-.map .city.future-c.lit circle.o { fill: var(--red); }
-.map .city text { font-family: var(--f-mono); font-size: 14px; fill: var(--ink); letter-spacing: .08em; }
-.map .city text.y { fill: var(--muted); font-size: 11px; }
-.map .plane path { fill: var(--red); }
+.map .city.future-c circle.o { stroke: #D7263D; }
+.map .city.future-c.lit circle.o { fill: #D7263D; }
+.map .city text { font-family: var(--f-mono); font-size: 14px; font-weight: 600; fill: var(--fg); letter-spacing: .08em; }
+.map .city text.y { fill: var(--mut); font-size: 11px; font-weight: 400; }
+.map .plane path { fill: #D7263D; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px 8px; justify-content: center; }
-.chip { font-family: var(--f-mono); font-size: 12px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.chip { font-family: var(--f-mono); font-size: 12px; padding: 4px 10px; border-radius: 999px; background: rgba(0,0,0,.06); color: var(--fg); white-space: nowrap; }
 .chip b { color: var(--green); font-weight: 600; margin-right: 6px; }
-.chip.f b { color: var(--red); }
+.chip.f b { color: #D7263D; }
 .tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 640px; }
-.tag { font-family: var(--f-display); font-weight: 700; font-size: clamp(18px, min(5vw, calc(var(--vh) * 3)), 26px); letter-spacing: .03em; padding: 6px 14px; border-radius: 999px; background: var(--bg-2); border: 1px solid var(--line); }
-.tag:nth-child(3n+1) { color: var(--amber); }
-.tag:nth-child(3n+2) { color: #7FD6A3; }
-.tag:nth-child(3n) { color: #FF8A98; }
-.langs { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; color: var(--muted); font-size: 14px; }
+.tag { font-family: var(--f-display); font-weight: 700; font-size: clamp(19px, min(5.2vw, calc(var(--vh) * 3.1)), 28px); letter-spacing: .03em; padding: 6px 16px; border-radius: 999px; background: #fff; color: var(--fg); box-shadow: 0 4px 0 rgba(0,0,0,.15); }
+.tag:nth-child(odd) { background: #FFF1D6; }
+.langs { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; color: var(--mut); font-size: 15px; }
 
 /* ---------- EXAM ---------- */
-.exam { background: var(--exam); color: #1E2430; border-radius: 4px; box-shadow: 0 14px 40px rgba(0,0,0,.5); padding: 22px 22px 20px 54px; position: relative; transform: rotate(1deg); background-image: linear-gradient(90deg, transparent 40px, #E8A0A0 40px 42px, transparent 42px), repeating-linear-gradient(transparent 0 29px, var(--rule) 29px 30px); background-position: 0 0, 0 12px; display: grid; gap: 10px; width: 100%; max-width: 560px; justify-self: center; }
+.exam { background: var(--exam); color: #1E2430; border-radius: 4px; box-shadow: 0 14px 34px rgba(0,0,0,.25); padding: 22px 22px 20px 54px; position: relative; transform: rotate(1deg); background-image: linear-gradient(90deg, transparent 40px, #E8A0A0 40px 42px, transparent 42px), repeating-linear-gradient(transparent 0 29px, var(--rule) 29px 30px); background-position: 0 0, 0 12px; display: grid; gap: 10px; width: 100%; max-width: 560px; justify-self: center; }
 .exam .hd { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-family: var(--f-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #4A5468; }
 .exam .q { font-weight: 600; line-height: 1.45; padding-right: 84px; font-size: clamp(14px, 3.8vw, 17px); }
 .exam .q small { font-weight: 400; color: #4A5468; }
@@ -186,12 +202,11 @@ p { margin: 0; }
 .exam .mark { position: absolute; right: 14px; top: 38px; font-family: var(--f-hand); font-weight: 700; font-size: 38px; color: #C8102E; transform: rotate(-10deg); line-height: 1; border: 3px solid #C8102E; border-radius: 50%; padding: 10px 7px 4px; }
 .exam .see { font-family: var(--f-hand); font-size: 24px; color: #C8102E; transform: rotate(-2deg); justify-self: end; line-height: 1.05; text-align: right; }
 
-/* ---------- TICKETS ---------- */
-.ticket { background: #F7F5EF; color: #15201A; border-radius: 12px; box-shadow: 0 14px 40px rgba(0,0,0,.5); display: grid; grid-template-columns: minmax(0, 1fr) 96px; overflow: hidden; transform: rotate(-1.5deg); width: 100%; max-width: 520px; justify-self: center; }
+/* ---------- TICKET ---------- */
+.ticket { background: #F7F5EF; color: #15201A; border-radius: 12px; box-shadow: 0 14px 34px rgba(0,0,0,.25); display: grid; grid-template-columns: minmax(0, 1fr) 96px; overflow: hidden; transform: rotate(-1.5deg); width: 100%; max-width: 520px; justify-self: center; }
 .ticket .main { padding: 18px 20px; display: grid; gap: 12px; }
-.ticket .stub { border-left: 2px dashed #CBD3CB; padding: 18px 12px; display: grid; align-content: space-between; gap: 10px; background: #E5EFE8; }
-.ticket.ru .stub { background: #F6E3E6; }
-.ticket .bigc { font-family: var(--f-display); font-size: 58px; line-height: .9; font-weight: 900; }
+.ticket .stub { border-left: 2px dashed #CBD3CB; padding: 18px 12px; display: grid; align-content: space-between; gap: 10px; background: #F6E3E6; }
+.ticket .bigc { font-family: var(--f-display); font-size: 58px; line-height: .9; font-weight: 900; color: #C8102E; }
 .ticket .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .ticket .grid div { display: grid; gap: 2px; }
 .ticket .k { font-family: var(--f-mono); font-size: 10px; letter-spacing: .12em; color: #5A6860; text-transform: uppercase; }
@@ -199,32 +214,34 @@ p { margin: 0; }
 .barcode { height: 50px; background: repeating-linear-gradient(90deg, #15201A 0 2px, transparent 2px 4px, #15201A 4px 5px, transparent 5px 9px, #15201A 9px 12px, transparent 12px 14px); }
 
 /* ---------- DISTANCE ---------- */
-.dist { background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: grid; gap: 14px; width: 100%; max-width: 520px; justify-self: center; }
+.dist { background: #fff; color: #1B1B1B; border-radius: 14px; padding: 18px 20px; display: grid; gap: 14px; width: 100%; max-width: 520px; justify-self: center; box-shadow: 0 14px 34px rgba(0,0,0,.22); transform: rotate(-1deg); }
 .dist .ends { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
 .dist .end { display: grid; text-align: center; }
 .dist .end b { font-family: var(--f-display); font-size: 44px; line-height: .9; }
-.dist .end span { font-family: var(--f-mono); font-size: 10px; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
-.dist .track { position: relative; height: 22px; border-bottom: 2px dashed var(--line); }
-.dist .track span { position: absolute; left: 50%; bottom: -11px; transform: translateX(-50%); background: var(--bg-2); padding: 0 8px; font-family: var(--f-mono); font-size: 12px; font-weight: 600; white-space: nowrap; }
-.dist .rowd { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 15px; }
-.dist .rowd span:first-child { color: var(--muted); }
+.dist .end:first-child b { color: var(--green); }
+.dist .end:last-child b { color: #E1251B; }
+.dist .end span { font-family: var(--f-mono); font-size: 10px; letter-spacing: .12em; color: #6B6B6B; text-transform: uppercase; }
+.dist .track { position: relative; height: 22px; border-bottom: 2px dashed #D5D5D5; }
+.dist .track span { position: absolute; left: 50%; bottom: -11px; transform: translateX(-50%); background: #fff; padding: 0 8px; font-family: var(--f-mono); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.dist .rowd { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid #EBEBEB; font-size: 15px; }
+.dist .rowd span:first-child { color: #6B6B6B; }
 .dist .rowd span:last-child { font-family: var(--f-mono); font-weight: 600; text-align: right; }
-.dist .good { color: #6FD39A; }
+.dist .good { color: var(--green); }
 
 /* ---------- PARTY ---------- */
-.card { background: linear-gradient(135deg, #CF142B 0 50%, #F7F4EC 50%); border-radius: 14px; padding: 16px; aspect-ratio: 1.586; width: min(300px, 76vw); max-width: 100%; color: #111; display: grid; grid-template-rows: auto 1fr auto; box-shadow: 0 14px 30px rgba(0,0,0,.5); justify-self: center; }
+.card { background: linear-gradient(135deg, #CF142B 0 50%, #F7F4EC 50%); border-radius: 14px; padding: 16px; aspect-ratio: 1.586; width: min(300px, 76vw); max-width: 100%; color: #111; display: grid; grid-template-rows: auto 1fr auto; box-shadow: 0 16px 34px rgba(0,0,0,.3); justify-self: center; border: 3px solid #fff; }
 .card .t { font-family: var(--f-display); font-weight: 900; font-size: 26px; line-height: .9; color: #F7F4EC; }
 .card .t small { display: block; font-family: var(--f-mono); font-size: 9px; letter-spacing: .16em; margin-top: 4px; font-weight: 400; }
 .card .emblem { justify-self: end; align-self: center; width: 70px; height: 70px; }
 .card .m { font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; display: flex; justify-content: space-between; gap: 8px; }
-.party-h .z { color: var(--amber); }
+.party-h .z { color: var(--acc); }
 .manifesto { margin: 0; padding: 0; list-style: none; display: grid; gap: clamp(6px, calc(var(--vh) * 1.1), 10px); counter-reset: art; font-size: clamp(14px, min(3.9vw, calc(var(--vh) * 2.1)), 17px); line-height: 1.4; }
 .manifesto li { counter-increment: art; display: grid; grid-template-columns: 62px 1fr; gap: 8px; }
-.manifesto li::before { content: "ART. " counter(art, upper-roman); font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; color: var(--amber); padding-top: 3px; }
-.fine { color: #858C87; font-size: 12px; font-style: italic; }
+.manifesto li::before { content: "ART. " counter(art, upper-roman); font-family: var(--f-mono); font-weight: 600; font-size: 11px; letter-spacing: .08em; color: var(--acc); padding-top: 3px; }
+.fine { color: var(--mut); font-size: 12px; font-style: italic; }
 
 /* ---------- TREATY ---------- */
-.treaty { background: var(--parch); color: var(--parch-ink); width: 100%; max-width: 720px; justify-self: center; padding: clamp(18px, 4vw, 40px); border-radius: 3px; box-shadow: 0 14px 40px rgba(0,0,0,.5), inset 0 0 60px rgba(150,110,40,.2); font-family: var(--f-old); font-size: clamp(14px, min(3.9vw, calc(var(--vh) * 2.15)), 18px); line-height: 1.45; display: grid; gap: clamp(8px, calc(var(--vh) * 1.5), 14px); }
+.treaty { background: var(--parch); color: var(--parch-ink); width: 100%; max-width: 720px; justify-self: center; padding: clamp(18px, 4vw, 40px); border-radius: 3px; box-shadow: 0 18px 40px rgba(0,0,0,.3), inset 0 0 60px rgba(150,110,40,.2); font-family: var(--f-old); font-size: clamp(14px, min(3.9vw, calc(var(--vh) * 2.2)), 18px); line-height: 1.45; display: grid; gap: clamp(8px, calc(var(--vh) * 1.5), 14px); }
 .treaty .eyebrow { font-family: var(--f-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: #7A6440; text-align: center; }
 .treaty h2 { font-family: var(--f-old); font-weight: 400; font-size: clamp(30px, min(8vw, calc(var(--vh) * 5)), 54px); text-align: center; line-height: 1.05; letter-spacing: 0; }
 .treaty .pre { font-style: italic; text-align: center; }
@@ -239,24 +256,24 @@ p { margin: 0; }
 .treaty .sig .name.blank { color: #9C8A66; font-size: 20px; display: flex; align-items: end; }
 .treaty .sig .ln { border-top: 1px solid var(--parch-ink); padding-top: 3px; font-size: 13px; font-style: italic; }
 .seal { position: absolute; right: 2px; bottom: 16px; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-family: var(--f-old); font-size: 20px; color: rgba(255,255,255,.88); box-shadow: inset 0 0 0 4px rgba(0,0,0,.15), 0 2px 4px rgba(0,0,0,.3); }
-.seal.g { background: #0B6B39; --r: -8deg; }
-.seal.r { background: #A50F25; --r: 10deg; }
+.seal.g { background: #0B6B39; }
+.seal.r { background: #A50F25; }
 
 /* ---------- LETTER ---------- */
-.letter { background: #FFFFFF; color: #1A211D; width: 100%; max-width: 680px; justify-self: center; border-radius: 6px; padding: clamp(20px, 4.5vw, 44px); box-shadow: 0 14px 40px rgba(0,0,0,.5); display: grid; gap: clamp(10px, calc(var(--vh) * 1.8), 16px); font-size: clamp(15px, min(4.1vw, calc(var(--vh) * 2.35)), 20px); line-height: 1.6; background-image: repeating-linear-gradient(-45deg, #C8102E 0 14px, transparent 14px 28px, #0B6B39 28px 42px, transparent 42px 56px); background-size: 100% 7px; background-repeat: no-repeat; position: relative; }
+.letter { background: #FFFFFF; color: #1A211D; width: 100%; max-width: 680px; justify-self: center; border-radius: 6px; padding: clamp(20px, 4.5vw, 44px); box-shadow: 0 18px 40px rgba(0,0,0,.2); display: grid; gap: clamp(10px, calc(var(--vh) * 1.8), 16px); font-size: clamp(15px, min(4.2vw, calc(var(--vh) * 2.4)), 20px); line-height: 1.6; background-image: repeating-linear-gradient(-45deg, #C8102E 0 14px, transparent 14px 28px, #0B6B39 28px 42px, transparent 42px 56px); background-size: 100% 7px; background-repeat: no-repeat; position: relative; }
 .letter .airmail { font-family: var(--f-mono); font-size: 10px; letter-spacing: .2em; color: #6A756F; text-transform: uppercase; }
 .letter .hi { font-family: var(--f-hand); font-size: 38px; line-height: 1; }
 .letter .sig { font-family: var(--f-hand); font-size: 42px; line-height: 1; color: #0B6B39; }
 .letter .pg { position: absolute; right: 18px; top: 18px; font-family: var(--f-mono); font-size: 10px; color: #8A948E; letter-spacing: .1em; }
 
 /* ---------- FINALE ---------- */
-.fin { font-size: clamp(54px, min(15vw, calc(var(--vh) * 12)), 140px); }
-.fin .o { color: var(--red); }
-.wish { font-family: var(--f-display); font-weight: 900; font-size: 24px; letter-spacing: .04em; text-transform: uppercase; border: 0; border-radius: 999px; padding: 14px 30px; background: var(--green); color: #fff; cursor: pointer; box-shadow: 0 6px 0 #0A4D2A; }
-.wish:active { transform: translateY(4px); box-shadow: 0 2px 0 #0A4D2A; }
-.ghost { font-family: var(--f-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; background: transparent; border: 1px solid var(--line); color: var(--muted); border-radius: 999px; padding: 10px 18px; cursor: pointer; }
+.fin { font-size: clamp(56px, min(15vw, calc(var(--vh) * 12)), 140px); }
+.fin .o { color: #fff; text-shadow: 0 4px 0 rgba(0,0,0,.18); }
+.wish { font-family: var(--f-display); font-weight: 900; font-size: 24px; letter-spacing: .04em; text-transform: uppercase; border: 0; border-radius: 999px; padding: 14px 30px; background: #1B1B1B; color: #fff; cursor: pointer; box-shadow: 0 6px 0 #000; }
+.wish:active { transform: translateY(4px); box-shadow: 0 2px 0 #000; }
+.ghost { font-family: var(--f-mono); font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; background: rgba(255,255,255,.4); border: 0; color: var(--fg); border-radius: 999px; padding: 10px 18px; cursor: pointer; }
 .btnrow { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-items: center; }
-.after { min-height: 1.5em; color: var(--muted); }
+.after { min-height: 1.5em; color: var(--fg); font-weight: 600; }
 
 canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 8; }
 
@@ -269,9 +286,7 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
   .exam .mark { font-size: 30px; right: 10px; top: 34px; }
   .exam .q { padding-right: 70px; }
 }
-@media (max-height: 640px) {
-  .stamp { display: none; }
-}
+@media (max-height: 640px) { .stamp { display: none; } }
 @media (prefers-reduced-motion: reduce) {
   .scene.active .in, .scene.active .pop, .scene.active .slam, .scene.active .strip svg, .scene.active .treaty .sig .name.write, .play, .st.now { animation: none !important; }
 }
@@ -280,7 +295,7 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
 <div class="stage pre" id="stage">
 
   <!-- 0 · START -->
-  <section class="scene active" data-dur="0" style="--glow: var(--amber)">
+  <section class="scene t-sky active" data-dur="0">
     <div class="sc center">
       <div class="ticketline mono">
         <span>Passenger <b>Antipov / Maxim</b></span>
@@ -296,49 +311,48 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
         </h1>
         <div class="rows">
           <div class="r head"><span>YEAR</span><span>DESTINATION</span><span>STATUS</span></div>
-          <div class="r"><span>2021</span><span>MALTA · MET AT SCHOOL</span><span class="st landed">MET</span></div>
+          <div class="r"><span>2021</span><span>MALTA</span><span class="st home">HOME</span></div>
           <div class="r"><span>2022</span><span>BARCELONA</span><span class="st landed">LANDED</span></div>
-          <div class="r"><span>····</span><span>MILANO</span><span class="st landed">LANDED</span></div>
+          <div class="r"><span>2023</span><span>MILANO</span><span class="st landed">LANDED</span></div>
           <div class="r"><span>2026</span><span>ROMA</span><span class="st now">NOW</span></div>
           <div class="r"><span>TBC</span><span>МОСКВА</span><span class="st soon">SOON</span></div>
         </div>
       </div>
       <button class="play" id="play" type="button"><svg viewBox="0 0 20 20"><path d="M5 3 L17 10 L5 17 Z"/></svg>Board now</button>
-      <p class="small">About 3 minutes · sound on if you can · tap to skip, hold to pause</p>
+      <p class="small">About 3 minutes. Sound on. Tap to skip, hold to pause.</p>
     </div>
   </section>
 
   <!-- 1 · INTRO -->
-  <section class="scene" data-dur="7500" style="--glow: var(--green)">
+  <section class="scene t-orange" data-dur="7000">
     <div class="sc center">
-      <span class="mono in" style="color:var(--muted)">A flight log for</span>
+      <span class="mono in mut">This one's for</span>
       <h2 class="big in" style="--d:.2s">Maxim Antipov.</h2>
-      <p class="note in" style="--d:.7s">Max, to everyone who matters.</p>
+      <p class="note in" style="--d:.7s">aka Max</p>
       <div class="tags">
-        <span class="tag pop" style="--d:1.4s; --r:-2deg">History nerd</span>
-        <span class="tag pop" style="--d:1.8s; --r:2deg">Politics nerd</span>
-        <span class="tag pop" style="--d:2.2s; --r:-1deg">Lokomotiv Moscow loyalist</span>
-        <span class="tag pop" style="--d:2.6s; --r:1.5deg">LUISS brain</span>
-        <span class="tag pop" style="--d:3s; --r:-2deg">PastizZ Party co-founder</span>
-        <span class="tag pop" style="--d:3.4s; --r:1deg">Born on Halloween, not remotely scary</span>
+        <span class="tag pop" style="--d:1.3s; --r:-2deg">History nerd</span>
+        <span class="tag pop" style="--d:1.7s; --r:2deg">Politics nerd</span>
+        <span class="tag pop" style="--d:2.1s; --r:-1deg">Lokomotiv till I die</span>
+        <span class="tag pop" style="--d:2.5s; --r:1.5deg">LUISS</span>
+        <span class="tag pop" style="--d:2.9s; --r:-2deg">PastizZ Party co-founder</span>
+        <span class="tag pop" style="--d:3.3s; --r:1deg">Halloween baby 🎃</span>
       </div>
-      <div class="langs in" style="--d:4.2s">
+      <div class="langs in" style="--d:4s">
         <span>С днём рождения, Макс!</span><span>Buon compleanno!</span><span>Għeluq sninek it-tajjeb!</span><span>Lá breithe sona duit!</span>
       </div>
     </div>
   </section>
 
   <!-- 2 · MAP -->
-  <section class="scene" data-dur="12000" data-hook="map" style="--glow: var(--red)">
+  <section class="scene t-cream" data-dur="12000" data-hook="map">
     <div class="sc center">
-      <span class="mono in" style="color:var(--muted)">Flight log · 2021 → forever</span>
-      <h2 class="mid in" style="--d:.15s">The route so far</h2>
+      <span class="mono in mut">2021 → now</span>
+      <h2 class="mid in" style="--d:.15s">Where we've been</h2>
       <div class="map in" style="--d:.3s; width:100%; max-width:640px">
-        <svg id="map" viewBox="0 0 620 500" role="img" aria-label="Map: Malta, Barcelona, Milan, Rome, Dublin, and someday Moscow">
+        <svg id="map" viewBox="0 0 620 500" role="img" aria-label="Map: Malta was home, with trips to Barcelona and Milan; now Max is in Rome and Scott is in Dublin; Moscow someday">
           <defs><pattern id="dotgrid" width="14" height="14" patternUnits="userSpaceOnUse"><circle class="dots" cx="2" cy="2" r="1.3"/></pattern></defs>
           <rect width="620" height="500" fill="url(#dotgrid)"/>
-          <path id="route" class="route" d=""/>
-          <path id="future" class="future" d=""/>
+          <g id="legs"></g>
           <path id="tether" class="tether" d=""/>
           <text id="tether-label" class="tether-label" text-anchor="middle"></text>
           <g id="cities"></g>
@@ -346,107 +360,99 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
         </svg>
       </div>
       <div class="chips in" style="--d:.6s">
-        <span class="chip"><b>MLA</b>where we met</span>
-        <span class="chip"><b>BCN</b>2022</span>
-        <span class="chip"><b>MIL</b>just us two</span>
-        <span class="chip"><b>ROM</b>your uni</span>
-        <span class="chip"><b>DUB</b>my uni</span>
+        <span class="chip"><b>MLA</b>home for years</span>
+        <span class="chip"><b>BCN</b>trip, 2022</span>
+        <span class="chip"><b>MIL</b>trip, Jan 2023</span>
+        <span class="chip"><b>ROM</b>you, now</span>
+        <span class="chip"><b>DUB</b>me, now</span>
         <span class="chip f"><b>MOW</b>someday</span>
       </div>
     </div>
   </section>
 
   <!-- 3 · MALTA -->
-  <section class="scene" data-dur="10000" style="--glow: var(--green)">
+  <section class="scene t-sky" data-dur="10000">
     <div class="sc split">
       <div class="txt">
-        <div class="strip in"><span>IRL</span><span class="ln"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></span><span>MLA</span><span class="sub">2021 · Scott moves to Malta</span></div>
-        <h2 class="mid in" style="--d:.3s">2021. I moved to Malta.<br><span style="color:var(--green)">Then I met you.</span></h2>
-        <p class="lede in" style="--d:1s">High school in Malta. Football after school, nights at the national stadium and far too many pastizzi. Somehow a guy from Ireland and a guy who'd die for Lokomotiv Moscow became best friends.</p>
+        <div class="strip in"><span>IRL</span><span class="ln"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></span><span>MLA</span><span class="sub">2021 · I move to Malta</span></div>
+        <h2 class="mid in" style="--d:.3s">2021. I moved to Malta and met you.</h2>
+        <p class="lede in" style="--d:1s">Then we lived there for years. School, football, games at the national stadium, an unreasonable amount of pastizzi. Honestly some of the best years.</p>
       </div>
       <div class="pile pair">
-        <figure class="polaroid pop" style="--d:1.6s; --r:-2.5deg"><img src="photos/tunnel.jpg" alt="Two friends smiling in a stadium tunnel at night, one in an Ireland jersey"><figcaption>Green jersey, purple hoodie, big smiles.</figcaption></figure>
-        <figure class="polaroid pop" style="--d:2.4s; --r:2.5deg"><img src="photos/stadium.jpg" alt="Two friends pulling faces in front of a floodlit pitch"><figcaption>Pre-match faces. Expectations: managed.</figcaption></figure>
+        <figure class="polaroid pop" style="--d:1.6s; --r:-2.5deg"><img src="photos/tunnel.jpg" alt="Two friends smiling in a stadium tunnel at night, one in an Ireland jersey"><figcaption>Ireland jersey on, obviously.</figcaption></figure>
+        <figure class="polaroid pop" style="--d:2.4s; --r:2.5deg"><img src="photos/stadium.jpg" alt="Two friends pulling faces in front of a floodlit pitch"><figcaption>Very serious pre-match analysis.</figcaption></figure>
       </div>
     </div>
   </section>
 
   <!-- 4 · HISTORY CLASS -->
-  <section class="scene" data-dur="12000" style="--glow: var(--gold)">
+  <section class="scene t-pink" data-dur="12000">
     <div class="sc split rev">
       <div class="txt">
-        <span class="stamp gold in"><span>Classroom</span><b>HIST</b><span>Ms Farrugia</span></span>
+        <span class="stamp in"><span>Classroom</span><b>HIST</b><span>Ms Farrugia</span></span>
         <h2 class="mid in" style="--d:.2s">History with Ms Farrugia.</h2>
-        <p class="lede in" style="--d:.6s">Good times. Two people who actually liked history, in a room full of people counting down to the bell. Every lesson turned into a debate.</p>
+        <p class="lede in" style="--d:.6s">Good times. We were the only two in that class who actually cared. Still are, to be fair.</p>
         <p class="note in" style="--d:8.5s">Ms Farrugia, if you're watching: it was mostly Max talking.</p>
       </div>
       <div class="exam in" style="--d:1s" aria-label="A mock history exam answer">
         <div class="hd"><span>History · Paper 1</span><span>Teacher: Ms Farrugia</span></div>
         <p class="q">Q1. Two students share a history class in Malta. Assess the long-term consequences. <small>(25 marks)</small></p>
-        <p class="a" data-type="A lasting alliance. Survived Barcelona, Milan, two universities, two countries and long stretches of radio silence. Never weakened. Consequences: permanent." data-start="2000" data-speed="32"></p>
-        <span class="mark slam" style="--d:7.4s" aria-label="25 out of 25">25/25</span>
-        <p class="see in" style="--d:7.9s">Excellent. Now stop talking.<br>— Ms F</p>
+        <p class="a" data-type="They become best mates. It survives Barcelona, Milan, two unis in two countries and months of not seeing each other. Consequences: permanent." data-start="2000" data-speed="32"></p>
+        <span class="mark slam" style="--d:7.2s" aria-label="25 out of 25">25/25</span>
+        <p class="see in" style="--d:7.7s">Good. Now stop talking.<br>— Ms F</p>
       </div>
     </div>
   </section>
 
   <!-- 5 · SQUAD -->
-  <section class="scene" data-dur="6500" style="--glow: var(--red)">
+  <section class="scene t-lime" data-dur="6500">
     <div class="sc center">
-      <h2 class="mid in">The squad.</h2>
+      <h2 class="mid in">The lads.</h2>
       <div class="pile one">
-        <figure class="polaroid pop h-one" style="--d:.4s; --r:-1.5deg"><img src="photos/squad.jpg" alt="Friends in football shirts on a five-a-side pitch"><figcaption>Fists clenched, egos larger. Two Arsenal shirts, one Celtic. Unacceptable.</figcaption></figure>
+        <figure class="polaroid pop h-one" style="--d:.4s; --r:-1.5deg"><img src="photos/squad.jpg" alt="Friends in football shirts on a five-a-side pitch"><figcaption>Two Arsenal shirts and one Celtic. Unacceptable.</figcaption></figure>
       </div>
     </div>
   </section>
 
   <!-- 6 · BARCELONA -->
-  <section class="scene" data-dur="10500" style="--glow: var(--red)">
+  <section class="scene t-coral" data-dur="10500">
     <div class="sc split">
       <div class="txt">
-        <div class="strip in"><span>MLA</span><span class="ln"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></span><span>BCN</span><span class="sub">2022 · the lads' trip</span></div>
-        <h2 class="mid in" style="--d:.3s">Barcelona, four years ago.</h2>
-        <p class="lede in" style="--d:.8s">Ryanair seats, a hotel room that turned into a wrestling ring, and the least impressed cathedral selfie in the history of Catalonia.</p>
+        <div class="strip in"><span>MLA</span><span class="ln"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></span><span>BCN</span><span class="sub">2022 · trip</span></div>
+        <h2 class="mid in" style="--d:.3s">Barcelona, 2022.</h2>
+        <p class="lede in" style="--d:.8s">Ryanair, a hotel room that turned into a wrestling match, and that cathedral photo where none of us could be bothered to smile.</p>
       </div>
       <div class="pile">
         <figure class="polaroid pop h-row" style="--d:1.4s; --r:-3deg; --pos: center 30%"><img src="photos/plane.jpg" alt="Two friends on a plane captioned Barca let's go"><figcaption>"Barca let's go 🛵🛵"</figcaption></figure>
-        <figure class="polaroid pop h-row" style="--d:2.2s; --r:2deg; --pos: center 55%"><img src="photos/wrestle.jpg" alt="Two friends play-wrestling on a hotel bed"><figcaption>Hotel room diplomacy.</figcaption></figure>
-        <figure class="polaroid pop h-row span2" style="--d:3s; --r:-1deg; --pos: center 82%"><img src="photos/cathedral.jpg" alt="Three friends pulling serious faces in front of Barcelona Cathedral"><figcaption>Three men. One cathedral. Zero smiles.</figcaption></figure>
+        <figure class="polaroid pop h-row" style="--d:2.2s; --r:2deg; --pos: center 55%"><img src="photos/wrestle.jpg" alt="Two friends play-wrestling on a hotel bed"><figcaption>Who won? Still disputed.</figcaption></figure>
+        <figure class="polaroid pop h-row span2" style="--d:3s; --r:-1deg; --pos: center 82%"><img src="photos/cathedral.jpg" alt="Three friends pulling serious faces in front of Barcelona Cathedral"><figcaption>Three lads, one cathedral, zero smiles.</figcaption></figure>
       </div>
     </div>
   </section>
 
   <!-- 7 · MILAN -->
-  <section class="scene" data-dur="8000" style="--glow: var(--gold)">
+  <section class="scene t-milan fgw" data-dur="10000">
     <div class="sc split rev">
       <div class="txt">
-        <div class="strip in"><span>BCN</span><span class="ln"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></span><span>MIL</span><span class="sub">just the two of us</span></div>
-        <h2 class="mid in" style="--d:.3s">Milan, just us two.</h2>
-        <p class="lede in" style="--d:.8s">No group chat, no squad. Just you and me wandering a city and talking for hours. One of my favourite memories of us.</p>
+        <div class="strip in"><span>MLA</span><span class="ln"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></span><span>MIL</span><span class="sub">Jan 2023 · just us two</span></div>
+        <h2 class="mid in" style="--d:.3s">Milan, January 2023.</h2>
+        <p class="lede in" style="--d:.8s">Just the two of us. AC Milan v Roma at San Siro, freezing cold and so loud. One of my favourite nights.</p>
       </div>
-      <div class="ticket pop" style="--d:1.4s; --r:-1.5deg" aria-label="Boarding pass to Milan">
-        <div class="main">
-          <span class="k">Boarding pass · Carta d'imbarco</span>
-          <div class="bigc">MIL</div>
-          <div class="grid">
-            <div><span class="k">Passengers</span><span class="v">2</span></div>
-            <div><span class="k">Class</span><span class="v">Best mates</span></div>
-            <div><span class="k">Seat</span><span class="v">Next to you</span></div>
-          </div>
-        </div>
-        <div class="stub"><span class="k">Scott + Max</span><div class="barcode" aria-hidden="true"></div><span class="k">Ottimo</span></div>
+      <div class="pile pair">
+        <figure class="polaroid pop" style="--d:1.4s; --r:-2.5deg; --pos: center 35%"><img src="photos/sansiro-tunnel.jpg" alt="Two friends under an AC Milan v Roma screen at San Siro"><figcaption>One of us bought a scarf.</figcaption></figure>
+        <figure class="polaroid pop" style="--d:2.2s; --r:2deg; --pos: center 60%"><img src="photos/sansiro.jpg" alt="San Siro packed with fans and flags at night"><figcaption>San Siro. Unreal.</figcaption></figure>
       </div>
     </div>
   </section>
 
   <!-- 8 · ROME -->
-  <section class="scene" data-dur="10000" style="--glow: var(--amber)">
+  <section class="scene t-yellow" data-dur="10000">
     <div class="sc split">
       <div class="txt">
-        <div class="strip in"><span>MIL</span><span class="ln"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></span><span>ROM</span><span class="sub">31 Oct 2026 · today</span></div>
-        <h2 class="mid in" style="--d:.3s">Rome, right now.</h2>
-        <p class="lede in" style="--d:.8s">You live here now, studying at LUISS, which surprises nobody. Of course the history and politics guy moved to the city with more history per square metre than anywhere on Earth. For you it's basically a theme park.</p>
-        <p class="note in" style="--d:4.5s">And today I'm here, taking you to lunch.</p>
+        <div class="strip in"><span>MLA</span><span class="ln"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></span><span>ROM</span><span class="sub">you move to Rome</span></div>
+        <h2 class="mid in" style="--d:.3s">Rome, now.</h2>
+        <p class="lede in" style="--d:.8s">You're at LUISS now, which makes total sense. The history and politics guy living in Rome is a bit on the nose, to be fair.</p>
+        <p class="note in" style="--d:4.2s">And today I'm here for your birthday lunch.</p>
       </div>
       <div class="pile one">
         <figure class="polaroid pop h-one" style="--d:1.6s; --r:1.5deg"><img src="photos/nandos.jpg" alt="Two friends at a restaurant table, one frowning and one grinning"><figcaption>Lunch preview. One of us was excited about the chicken.</figcaption></figure>
@@ -455,41 +461,40 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
   </section>
 
   <!-- 9 · DUBLIN / ROME -->
-  <section class="scene" data-dur="12000" style="--glow: var(--green)">
+  <section class="scene t-green fgw" data-dur="11500">
     <div class="sc split rev">
       <div class="txt">
-        <span class="stamp red in"><span>Two unis</span><b>DUB ⇄ ROM</b><span>Two countries</span></span>
+        <span class="stamp in"><span>Two unis</span><b>DUB ⇄ ROM</b><span>Two countries</span></span>
         <h2 class="mid in" style="--d:.2s">Dublin and Rome.</h2>
-        <p class="lede in" style="--d:.6s">I'm at uni in Dublin, you're at uni in Rome, and we can go ages without seeing each other.</p>
-        <p class="lede in" style="--d:2.2s">Then we do, and it's like no time has passed. Same jokes, same arguments about history. That's how I know this one's real.</p>
+        <p class="lede in" style="--d:.6s">I'm at uni in Dublin, you're in Rome, and we can go months without seeing each other.</p>
+        <p class="lede in" style="--d:2.4s">Then we meet up and it's like nothing changed. I love that about us.</p>
       </div>
       <div class="dist in" style="--d:1s" aria-label="Distance report">
-        <span class="mono" style="color:var(--muted)">Official distance report</span>
+        <span class="mono" style="color:#6B6B6B">Distance report</span>
         <div class="ends"><div class="end"><b>DUB</b><span>Scott</span></div><div class="track"><span>1,886 km</span></div><div class="end"><b>ROM</b><span>Max</span></div></div>
         <div>
-          <div class="rowd in" style="--d:3.4s"><span>Time since we last saw each other</span><span>Ages</span></div>
-          <div class="rowd in" style="--d:4.2s"><span>Messages per week</span><span>Irrelevant</span></div>
-          <div class="rowd in" style="--d:5s"><span>Closeness lost</span><span class="good">0%</span></div>
-          <div class="rowd in" style="--d:5.8s"><span>Time to pick up where we left off</span><span class="good">~4 seconds</span></div>
-          <div class="rowd in" style="--d:6.6s"><span>Status</span><span class="good">Exactly the same</span></div>
+          <div class="rowd in" style="--d:3.6s"><span>Last saw each other</span><span>Ages ago</span></div>
+          <div class="rowd in" style="--d:4.6s"><span>Messages</span><span>Not many, tbh</span></div>
+          <div class="rowd in" style="--d:5.6s"><span>Closeness lost</span><span class="good">0%</span></div>
+          <div class="rowd in" style="--d:6.6s"><span>Time to get back to normal</span><span class="good">About 4 seconds</span></div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- 10 · MOSCOW -->
-  <section class="scene" data-dur="8500" style="--glow: var(--red)">
+  <section class="scene t-snow" data-dur="8500">
     <div class="sc split">
       <div class="txt">
-        <div class="strip in"><span>ROM</span><span class="ln"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></span><span>MOW</span><span class="sub">date to be confirmed</span></div>
-        <h2 class="mid in" style="--d:.3s">Moscow, someday.</h2>
-        <p class="lede in" style="--d:.8s">One day I'm coming to Russia. You show me Moscow, we go to a Lokomotiv game at the RZD Arena, and I pretend I understand the chants. That's a promise.</p>
+        <div class="strip in"><span>ROM</span><span class="ln"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></span><span>MOW</span><span class="sub">date TBC</span></div>
+        <h2 class="mid in" style="--d:.3s">Moscow, at some point.</h2>
+        <p class="lede in" style="--d:.8s">I'm coming to Russia. You show me around, we go to a Lokomotiv game, and I pretend to know the chants.</p>
         <p class="note in" style="--d:4s">Вперёд, Локомотив!</p>
       </div>
-      <div class="ticket ru pop" style="--d:1.6s; --r:1.5deg" aria-label="Open ticket to Moscow">
+      <div class="ticket pop" style="--d:1.6s; --r:1.5deg" aria-label="Open ticket to Moscow">
         <div class="main">
           <span class="k">Open ticket · Посадочный талон</span>
-          <div class="bigc" style="color:#C8102E">MOW</div>
+          <div class="bigc">MOW</div>
           <div class="grid">
             <div><span class="k">Date</span><span class="v">TBC</span></div>
             <div><span class="k">Guide</span><span class="v">Max</span></div>
@@ -502,19 +507,20 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
   </section>
 
   <!-- 11 · DECLASSIFIED -->
-  <section class="scene" data-dur="8000" style="--glow: var(--gold)">
+  <section class="scene t-lilac" data-dur="9000">
     <div class="sc center">
-      <span class="mono in" style="color:var(--red)">Evidence locker · do not distribute (too late)</span>
-      <h2 class="mid in" style="--d:.15s">Declassified files.</h2>
+      <span class="mono in" style="color:var(--acc); font-weight:600">Evidence locker · do not share (too late)</span>
+      <h2 class="mid in" style="--d:.15s">Declassified.</h2>
       <div class="pile" style="max-width:620px">
-        <figure class="polaroid pop h-tall" style="--d:.8s; --r:-3deg; --pos: center 40%"><img src="photos/towel.jpg" alt="Two friends pouting, one with a hoodie wrapped on his head"><figcaption>Historians remain divided on this one.</figcaption></figure>
-        <figure class="polaroid pop h-tall" style="--d:2s; --r:2.5deg; --pos: center 30%"><img src="photos/mirror.jpg" alt="Mirror selfie screenshot captioned like da flex"><figcaption>"like da flex?" Yes. Obviously.</figcaption></figure>
+        <figure class="polaroid pop h-row" style="--d:.7s; --r:-3deg; --pos: center 40%"><img src="photos/towel.jpg" alt="Two friends pouting, one with a hoodie wrapped on his head"><figcaption>No comment.</figcaption></figure>
+        <figure class="polaroid pop h-row" style="--d:1.7s; --r:2.5deg; --pos: center 30%"><img src="photos/mirror.jpg" alt="Mirror selfie screenshot captioned like da flex"><figcaption>"like da flex?" Yes.</figcaption></figure>
+        <figure class="polaroid pop h-row span2" style="--d:2.8s; --r:-1deg; --pos: center 42%"><img src="photos/asleep.jpg" alt="Friend asleep with earbuds in on an Air Malta flight"><figcaption>Asleep on Air Malta before the seatbelt sign went off.</figcaption></figure>
       </div>
     </div>
   </section>
 
   <!-- 12 · PASTIZZ PARTY -->
-  <section class="scene" data-dur="14000" style="--glow: var(--red)">
+  <section class="scene t-red fgw" data-dur="14000">
     <div class="sc split">
       <div class="txt center" style="justify-items:center">
         <div class="card pop" style="--d:.3s; --r:-3deg" aria-label="PastizZ Party membership card">
@@ -525,92 +531,92 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
       </div>
       <div class="txt">
         <h2 class="mid party-h in" style="--d:.6s">PastizZ Party<span class="z">.</span></h2>
-        <p class="lede dim in" style="--d:1s">The official, entirely hypothetical movement for Maltese global domination.</p>
+        <p class="lede dim in" style="--d:1s">Our totally hypothetical plan for Maltese world domination.</p>
         <ol class="manifesto">
-          <li class="in" style="--d:2s">Every citizen of Earth gets two pastizzi a day, one ricotta and one pea.</li>
-          <li class="in" style="--d:3.6s">Valletta becomes capital of the world. Rome may keep its title as a hobby.</li>
-          <li class="in" style="--d:5.2s">Lokomotiv Moscow are granted honorary Maltese status.</li>
-          <li class="in" style="--d:6.8s">Comrade Max is Minister for Being Annoyingly Smart.</li>
-          <li class="in" style="--d:8.2s">Comrade Scott is Minister for Irish Affairs and Overly Long Birthday Websites.</li>
-          <li class="in" style="--d:9.6s">Ms Farrugia is Minister of Education. The Great Siege of 1565 is the national curriculum.</li>
+          <li class="in" style="--d:2s">Two pastizzi a day for everyone on Earth. One ricotta, one pea.</li>
+          <li class="in" style="--d:3.6s">Valletta is the new capital of the world. Rome can keep its title as a hobby.</li>
+          <li class="in" style="--d:5.2s">Lokomotiv Moscow get honorary Maltese status.</li>
+          <li class="in" style="--d:6.8s">Max is Minister for Being Annoyingly Smart.</li>
+          <li class="in" style="--d:8.2s">Scott is Minister for Irish Affairs and Overly Long Birthday Websites.</li>
+          <li class="in" style="--d:9.6s">Ms Farrugia runs Education. The Great Siege of 1565 is the whole curriculum.</li>
         </ol>
-        <p class="fine in" style="--d:11s">Satire. Nobody is annexing anything, except possibly the last pastizz.</p>
+        <p class="fine in" style="--d:11s">It's a joke. Nobody's annexing anything, except maybe the last pastizz.</p>
       </div>
     </div>
   </section>
 
   <!-- 13 · TREATY -->
-  <section class="scene" data-dur="16000" style="--glow: var(--gold)">
+  <section class="scene t-blue fgw" data-dur="15000">
     <div class="sc">
       <div class="treaty in">
-        <span class="eyebrow">A document of great historical importance</span>
+        <span class="eyebrow">A very important historical document</span>
         <h2>The Treaty of Valletta</h2>
-        <p class="pre">Concluded at Malta, 2021. Ratified at Barcelona, Milan, and Rome on 31 October 2026. Between the Irish Party (Scott, now of Dublin) and the Lokomotiv Party (Max, now of Rome).</p>
+        <p class="pre">Signed in Malta, 2021. Between Scott (now of Dublin) and Max (now of Rome).</p>
         <ol>
-          <li class="in" style="--d:1.6s">The High Contracting Parties shall remain best friends in perpetuity.</li>
-          <li class="in" style="--d:3.2s">The 1,886 km between Dublin and Rome shall have no effect on this alliance.</li>
-          <li class="in" style="--d:4.8s">Going ages without seeing each other shall not count as withdrawal. On meeting again, the Parties carry on exactly where they left off.</li>
-          <li class="in" style="--d:6.6s">Disputes over history and politics are settled the traditional way: three hours of arguing, then food.</li>
-          <li class="in" style="--d:8.2s">There is no expiry date and no exit clause. Nobody is leaving.</li>
+          <li class="in" style="--d:1.4s">We stay best mates. Permanently.</li>
+          <li class="in" style="--d:2.8s">The 1,886 km between Dublin and Rome changes nothing.</li>
+          <li class="in" style="--d:4.2s">Months without seeing each other doesn't count. We just pick up where we left off.</li>
+          <li class="in" style="--d:5.8s">History and politics arguments: three hours minimum, then food.</li>
+          <li class="in" style="--d:7.4s">No exit clause. Nobody's going anywhere.</li>
         </ol>
         <div class="sigs">
-          <div class="sig"><span class="name write" style="--d:9.8s">Scott</span><span class="ln">For the Irish Party</span><span class="seal g slam" style="--d:11s" aria-hidden="true">S</span></div>
-          <div class="sig"><span class="name blank in" style="--d:11.8s">sign here at lunch →</span><span class="ln">For the Lokomotiv Party</span><span class="seal r slam" style="--d:12.4s" aria-hidden="true">M</span></div>
+          <div class="sig"><span class="name write" style="--d:9s">Scott</span><span class="ln">For Ireland</span><span class="seal g slam" style="--d:10.2s" aria-hidden="true">S</span></div>
+          <div class="sig"><span class="name blank in" style="--d:11s">sign here at lunch →</span><span class="ln">For Lokomotiv</span><span class="seal r slam" style="--d:11.6s" aria-hidden="true">M</span></div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- 14 · LETTER 1 -->
-  <section class="scene" data-dur="13000" style="--glow: var(--green)">
+  <section class="scene t-mint" data-dur="13000">
     <div class="sc">
       <div class="letter in">
         <span class="pg">1/3</span>
-        <span class="airmail">Par avion · Airmail · To: Max</span>
+        <span class="airmail">Par avion · To: Max</span>
         <p class="hi in" style="--d:.5s">Max,</p>
-        <p class="in" style="--d:1.2s">Happy birthday man. I wanted to give you something a bit better than a text, so here we are.</p>
-        <p class="in" style="--d:3.4s">I moved to Malta in 2021, met you at school, and you've been one of my best friends ever since. History with Ms Farrugia, Barcelona, Milan, the football, the stupid nights, all of it.</p>
-        <p class="in" style="--d:7s">Somewhere along the way we became the two people who'd happily argue about history and politics for three hours while everyone else wanted to go home. I wouldn't change that for anything.</p>
+        <p class="in" style="--d:1.2s">Happy birthday man. Thought I'd do something a bit better than a text this year.</p>
+        <p class="in" style="--d:3.2s">I moved to Malta in 2021, met you at school, and we've been best mates ever since. Years of living there, history with Ms Farrugia, Barcelona, Milan, football, all the stupid nights.</p>
+        <p class="in" style="--d:6.8s">You're one of the only people I can argue about history and politics with for three hours and actually enjoy it.</p>
       </div>
     </div>
   </section>
 
   <!-- 15 · LETTER 2 -->
-  <section class="scene" data-dur="13000" style="--glow: var(--green)">
+  <section class="scene t-peach" data-dur="11500">
     <div class="sc">
       <div class="letter in">
         <span class="pg">2/3</span>
-        <p class="in" style="--d:.4s">Now I'm at uni in Dublin and you're in Rome. Different countries, different lives, and sometimes we go ages without seeing each other.</p>
-        <p class="in" style="--d:3.4s">But every time we do, it's like no time has passed. Same jokes, same debates, same us.</p>
-        <p class="in" style="--d:6.2s">We don't talk all the time, and we don't need to. Our friendship has never needed to be constant to be real, and to me that's the best kind there is.</p>
+        <p class="in" style="--d:.4s">Now I'm in Dublin and you're in Rome, and sometimes we go ages without seeing each other.</p>
+        <p class="in" style="--d:2.8s">But whenever we do, it's like nothing's changed, and I really love that.</p>
+        <p class="in" style="--d:5.2s">We don't need to talk every day for it to be a proper friendship. Ours never has.</p>
       </div>
     </div>
   </section>
 
   <!-- 16 · LETTER 3 -->
-  <section class="scene" data-dur="14000" style="--glow: var(--red)">
+  <section class="scene t-pale" data-dur="13500">
     <div class="sc">
       <div class="letter in">
         <span class="pg">3/3</span>
-        <p class="in" style="--d:.4s">You're one of the smartest people I know, and somehow one of the kindest too. You're a genuinely good person, Max, and I'm really lucky to have you as a mate.</p>
-        <p class="in" style="--d:4s">Future historians will note that I flew to Rome for your birthday lunch. Make sure they get that part right.</p>
-        <p class="in" style="--d:7.4s">I love you, brother. Here's to another year, and to Moscow next.</p>
-        <p class="sig in" style="--d:9.6s">Scott</p>
+        <p class="in" style="--d:.4s">You're one of the smartest people I know and one of the kindest. You're a genuinely good person, Max. I'm proud of you and I'm lucky to have you.</p>
+        <p class="in" style="--d:4s">Also, for the record, I flew to Rome for your birthday lunch. Remember that.</p>
+        <p class="in" style="--d:6.8s">Love you, brother. Moscow next.</p>
+        <p class="sig in" style="--d:8.6s">Scott</p>
       </div>
     </div>
   </section>
 
   <!-- 17 · FINALE -->
-  <section class="scene" data-dur="0" data-hook="finale" style="--glow: var(--amber)">
+  <section class="scene t-orange" data-dur="0" data-hook="finale">
     <div class="sc center">
-      <span class="mono in" style="color:var(--muted)">Final call for passenger Antipov</span>
+      <span class="mono in mut">Final call for passenger Antipov</span>
       <h2 class="fin in" style="--d:.2s">Happy birthday,<br><span class="o">Max.</span></h2>
       <div class="btnrow in" style="--d:.8s">
         <button class="wish" id="wish" type="button">Make a wish</button>
         <button class="ghost" id="replay" type="button">Watch again</button>
       </div>
       <p class="after" id="after" aria-live="polite"></p>
-      <span class="mono in" style="--d:1.4s; color:var(--muted)">Made with love by Scott, the Irish one · Roma, 31.10.2026</span>
+      <span class="mono in mut" style="--d:1.4s">From Scott · Roma, 31.10.2026</span>
     </div>
   </section>
 </div>
@@ -659,33 +665,37 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
   }
   setTimeout(shuffle, 300);
 
-  /* ---------- map ---------- */
+  /* ---------- map: Malta is home, trips go out and back ---------- */
   var P = function (lon, lat) { return [(lon + 9) * 13, (58 - lat) * 20]; };
-  var cities = [
-    { name: 'MALTA', y: 'MET 2021', p: P(14.51, 35.9), dx: 12, dy: 5 },
-    { name: 'BARCELONA', y: '2022', p: P(2.17, 41.39), dx: -6, dy: 26 },
-    { name: 'MILANO', y: 'DUO', p: P(9.19, 45.46), dx: 12, dy: -8 },
-    { name: 'ROMA', y: 'MAX · UNI', p: P(12.5, 41.9), dx: 13, dy: 4 },
-    { name: 'МОСКВА', y: 'SOMEDAY', p: P(37.6, 55.75), dx: -14, dy: 4, anchor: 'end', future: true }
-  ];
-  var dub = { name: 'DUBLIN', y: 'SCOTT · UNI', p: P(-6.26, 53.35), dx: 12, dy: 5, home: true };
+  var C = {
+    MLA: { name: 'MALTA', y: 'HOME', p: P(14.51, 35.9), dx: 12, dy: 5, home: true },
+    BCN: { name: 'BARCELONA', y: 'TRIP · 2022', p: P(2.17, 41.39), dx: -6, dy: 26 },
+    MIL: { name: 'MILANO', y: 'TRIP · JAN 2023', p: P(9.19, 45.46), dx: 12, dy: -8 },
+    ROM: { name: 'ROMA', y: 'MAX · NOW', p: P(12.5, 41.9), dx: 13, dy: 4 },
+    DUB: { name: 'DUBLIN', y: 'SCOTT · NOW', p: P(-6.26, 53.35), dx: 12, dy: 5, home: true },
+    MOW: { name: 'МОСКВА', y: 'SOMEDAY', p: P(37.6, 55.75), dx: -14, dy: 4, anchor: 'end', future: true }
+  };
   function curve(a, b, bend) {
     var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, dx = b[0] - a[0], dy = b[1] - a[1];
-    return 'Q' + (mx - dy * bend).toFixed(1) + ',' + (my + dx * bend).toFixed(1) + ' ' + b[0].toFixed(1) + ',' + b[1].toFixed(1);
+    return 'M' + a.join(',') + ' Q' + (mx - dy * bend).toFixed(1) + ',' + (my + dx * bend).toFixed(1) + ' ' + b[0].toFixed(1) + ',' + b[1].toFixed(1);
   }
-  var route = document.getElementById('route'), future = document.getElementById('future');
-  var d = 'M' + cities[0].p.join(',');
-  for (var i = 1; i < 4; i++) d += ' ' + curve(cities[i - 1].p, cities[i].p, i % 2 ? .28 : -.28);
-  route.setAttribute('d', d);
-  future.setAttribute('d', 'M' + cities[3].p.join(',') + ' ' + curve(cities[3].p, cities[4].p, .22));
-  document.getElementById('tether').setAttribute('d', 'M' + dub.p.join(',') + ' ' + curve(dub.p, cities[3].p, -.12));
+  var ns = 'http://www.w3.org/2000/svg', legsG = document.getElementById('legs');
+  function mkPath(a, b, bend, cls) {
+    var p = document.createElementNS(ns, 'path');
+    p.setAttribute('d', curve(C[a].p, C[b].p, bend)); p.setAttribute('class', 'leg' + (cls ? ' ' + cls : ''));
+    legsG.appendChild(p); return { el: p, len: p.getTotalLength() };
+  }
+  var pBCN = mkPath('MLA', 'BCN', -.25), pMIL = mkPath('MLA', 'MIL', -.25), pROM = mkPath('MLA', 'ROM', .3), pMOW = mkPath('ROM', 'MOW', .22, 'future');
+  // flight sequence: [path, reverse?, city that lights up on arrival]
+  var legs = [[pBCN, false, 'BCN'], [pBCN, true, null], [pMIL, false, 'MIL'], [pMIL, true, null], [pROM, false, 'ROM'], [pMOW, false, 'MOW']];
+  document.getElementById('tether').setAttribute('d', curve(C.DUB.p, C.ROM.p, -.12));
   var tl = document.getElementById('tether-label');
-  tl.setAttribute('x', ((dub.p[0] + cities[3].p[0]) / 2 - 44).toFixed(1));
-  tl.setAttribute('y', ((dub.p[1] + cities[3].p[1]) / 2 + 16).toFixed(1));
+  tl.setAttribute('x', ((C.DUB.p[0] + C.ROM.p[0]) / 2 - 44).toFixed(1));
+  tl.setAttribute('y', ((C.DUB.p[1] + C.ROM.p[1]) / 2 + 16).toFixed(1));
   tl.textContent = '1,886 KM';
-  var g = document.getElementById('cities'), ns = 'http://www.w3.org/2000/svg';
-  cities.concat([dub]).forEach(function (c) {
-    var grp = document.createElementNS(ns, 'g');
+  var g = document.getElementById('cities');
+  Object.keys(C).forEach(function (k) {
+    var c = C[k], grp = document.createElementNS(ns, 'g');
     grp.setAttribute('class', 'city' + (c.future ? ' future-c' : '') + (c.home ? ' home' : ''));
     var o = document.createElementNS(ns, 'circle');
     o.setAttribute('class', 'o'); o.setAttribute('cx', c.p[0]); o.setAttribute('cy', c.p[1]); o.setAttribute('r', 7);
@@ -696,45 +706,36 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
     grp.appendChild(o); grp.appendChild(t); grp.appendChild(y); g.appendChild(grp); c.el = grp;
   });
   var plane = document.getElementById('plane');
-  var L1 = route.getTotalLength(), L2 = future.getTotalLength();
-  var stops = [0];
-  (function () {
-    var seg = 1;
-    for (var s = 0; s <= L1 && seg < 4; s += 1.5) {
-      var pt = route.getPointAtLength(s);
-      if (Math.hypot(pt.x - cities[seg].p[0], pt.y - cities[seg].p[1]) < 2.5) { stops.push(s); seg++; }
-    }
-    while (stops.length < 4) stops.push(L1);
-  })();
-  function place(path, len, s) {
-    var a = path.getPointAtLength(Math.max(0, s - 1)), b = path.getPointAtLength(Math.min(len, s + 1));
-    var ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI, p = path.getPointAtLength(s);
+  function place(path, s, rev) {
+    var L = path.len, a = path.el.getPointAtLength(Math.max(0, s - 1)), b = path.el.getPointAtLength(Math.min(L, s + 1));
+    var ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI + (rev ? 180 : 0), p = path.el.getPointAtLength(s);
     plane.setAttribute('transform', 'translate(' + p.x.toFixed(1) + ',' + p.y.toFixed(1) + ') rotate(' + ang.toFixed(1) + ')');
   }
-  function light(n) { cities.forEach(function (c, i) { c.el.classList.toggle('lit', i <= n); }); }
+  function light(n) {
+    var lit = {};
+    for (var i = 0; i < n; i++) if (legs[i][2]) lit[legs[i][2]] = true;
+    ['BCN', 'MIL', 'ROM', 'MOW'].forEach(function (k) { C[k].el.classList.toggle('lit', !!lit[k]); });
+  }
   var ease = function (x) { return x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2; };
+  function legPos(k, f) { var L = legs[k], s = L[1] ? L[0].len * (1 - f) : L[0].len * f; place(L[0], s, L[1]); }
   function mapAt(p) {
-    if (reduce) { place(route, L1, L1); light(3); return; }
-    var legs = [[route, L1, stops[0], stops[1]], [route, L1, stops[1], stops[2]], [route, L1, stops[2], L1], [future, L2, 0, L2]];
-    var start = .08, len = .17, gap = .05;
-    if (p < start) { place(route, L1, 0); light(0); return; }
-    for (var k = 0; k < 4; k++) {
+    if (reduce) { legPos(4, 1); light(6); return; }
+    var start = .06, len = .115, gap = .035;
+    if (p < start) { legPos(0, 0); light(0); return; }
+    for (var k = 0; k < legs.length; k++) {
       var s0 = start + k * (len + gap);
-      if (p < s0 + len) {
-        var f = ease(Math.max(0, (p - s0) / len)), L = legs[k];
-        place(L[0], L[1], L[2] + (L[3] - L[2]) * f); light(k); return;
-      }
-      if (p < s0 + len + gap) { var M = legs[k]; place(M[0], M[1], M[3]); light(k + 1); return; }
+      if (p < s0 + len) { legPos(k, ease(Math.max(0, (p - s0) / len))); light(k); return; }
+      if (p < s0 + len + gap) { legPos(k, 1); light(k + 1); return; }
     }
-    place(future, L2, L2); light(4);
+    legPos(legs.length - 1, 1); light(legs.length);
   }
   mapAt(0);
 
   /* ---------- typewriter ---------- */
   document.querySelectorAll('[data-type]').forEach(function (el) { el.textContent = reduce ? el.dataset.type : ''; });
   function typeAt(scene, ms) {
+    if (reduce) return;
     scene.querySelectorAll('[data-type]').forEach(function (el) {
-      if (reduce) return;
       var full = el.dataset.type, n = Math.max(0, Math.floor((ms - (+el.dataset.start || 0)) / (+el.dataset.speed || 35)));
       var txt = full.slice(0, Math.min(n, full.length));
       if (el.textContent !== txt) el.textContent = txt;
@@ -761,6 +762,8 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
     var sc = scenes[i];
     sc.classList.remove('active'); void sc.offsetWidth; sc.classList.add('active');
     sc.scrollTop = 0;
+    document.body.classList.toggle('fgw', sc.classList.contains('fgw'));
+    document.body.style.background = getComputedStyle(sc).getPropertyValue('--bg-s');
     idx = i; elapsed = 0;
     fills.forEach(function (b, k) { if (b) b.style.width = k < i ? '100%' : '0%'; });
     if (sc.dataset.hook === 'map') mapAt(0);
@@ -796,24 +799,22 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
   }
   document.getElementById('play').addEventListener('click', start);
 
-  /* tap / hold */
   var holdTimer = null, downX = 0;
   stage.addEventListener('pointerdown', function (e) {
-    if (e.target.closest('button, a')) return;
-    if (!started) return;
+    if (e.target.closest('button, a') || !started) return;
     downX = e.clientX;
     holdTimer = setTimeout(function () { holding = true; syncPaused(); }, 220);
   });
-  function release(e, cancel) {
+  function release(cancel) {
     if (holdTimer === null) return;
     clearTimeout(holdTimer); holdTimer = null;
     if (holding) { holding = false; syncPaused(); return; }
     if (cancel) return;
     if (downX < window.innerWidth * 0.3) prev(); else next();
   }
-  stage.addEventListener('pointerup', function (e) { release(e, false); });
-  stage.addEventListener('pointercancel', function (e) { release(e, true); });
-  stage.addEventListener('pointerleave', function (e) { if (holding) release(e, true); });
+  stage.addEventListener('pointerup', function () { release(false); });
+  stage.addEventListener('pointercancel', function () { release(true); });
+  stage.addEventListener('pointerleave', function () { if (holding) release(true); });
   stage.addEventListener('click', function (e) { if (!started && !e.target.closest('button')) start(); });
   document.getElementById('nextbtn').addEventListener('click', next);
   document.getElementById('prevbtn').addEventListener('click', prev);
@@ -832,7 +833,7 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
   document.addEventListener('visibilitychange', syncPaused);
   document.getElementById('replay').addEventListener('click', function () { userPaused = false; syncPaused(); Music.restart(); show(1); });
 
-  /* ---------- music box (Web Audio, starts only after Board now) ---------- */
+  /* ---------- music box (Web Audio; starts only after Board now) ---------- */
   var Music = (function () {
     var ac = null, master = null, muted = false, timer = null, nextT = 0, step = 0, mode = 'off';
     var NOTE = { G4: 392, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99 };
@@ -840,9 +841,8 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
     var CHORDS = [[261.63, 329.63, 392, 523.25], [220, 261.63, 329.63, 440], [174.61, 220, 261.63, 349.23], [196, 246.94, 293.66, 392]];
     var PAT = [0, 2, 1, 3, 2, 1, 3, 2];
     function tone(f, t, len, vol) {
-      var o = ac.createOscillator(), o2 = ac.createOscillator(), gn = ac.createGain();
-      o.type = 'triangle'; o.frequency.value = f; o2.type = 'sine'; o2.frequency.value = f * 2;
-      var g2 = ac.createGain(); g2.gain.value = .25;
+      var o = ac.createOscillator(), o2 = ac.createOscillator(), gn = ac.createGain(), g2 = ac.createGain();
+      o.type = 'triangle'; o.frequency.value = f; o2.type = 'sine'; o2.frequency.value = f * 2; g2.gain.value = .25;
       o.connect(gn); o2.connect(g2); g2.connect(gn); gn.connect(master);
       gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(vol, t + .012); gn.gain.exponentialRampToValueAtTime(0.0001, t + len + .9);
       o.start(t); o2.start(t); o.stop(t + len + 1); o2.stop(t + len + 1);
@@ -867,10 +867,10 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
         try {
           var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
           ac = new AC(); master = ac.createGain(); master.gain.value = muted ? 0 : .8; master.connect(ac.destination);
-          var end = playHB(ac.currentTime + .25); startLoop(end + 1.2);
+          startLoop(playHB(ac.currentTime + .25) + 1.2);
         } catch (e) { ac = null; }
       },
-      restart: function () { if (!ac) return; clearInterval(timer); mode = 'off'; var end = playHB(ac.currentTime + .2); startLoop(end + 1.2); },
+      restart: function () { if (!ac) return; clearInterval(timer); mode = 'off'; startLoop(playHB(ac.currentTime + .2) + 1.2); },
       finale: function () { if (!ac) return; clearInterval(timer); mode = 'off'; playHB(ac.currentTime + .4); },
       setPaused: function (p) { if (!ac) return; try { p ? ac.suspend() : ac.resume(); } catch (e) {} },
       toggleMute: function () { muted = !muted; if (master) master.gain.setTargetAtTime(muted ? 0 : .8, ac.currentTime, .05); return muted; }
@@ -881,7 +881,7 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
   var cv = document.getElementById('confetti'), cx = cv.getContext('2d'), bits = [], running = false;
   function size() { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; }
   size(); addEventListener('resize', size);
-  var COLORS = ['#E5384F', '#2FAE68', '#E2A33A', '#F3E9CC', '#7FD6A3', '#FF8A98'];
+  var COLORS = ['#E63946', '#169B62', '#FFD23F', '#FFFFFF', '#4DB8FF', '#1B1B1B'];
   function burst() {
     var W = cv.width, H = cv.height, n = reduce ? 40 : 180, k = devicePixelRatio;
     for (var i = 0; i < n; i++) bits.push({ x: W / 2 + (Math.random() - .5) * W * .3, y: H * .8, vx: (Math.random() - .5) * 18 * k, vy: -(10 + Math.random() * 16) * k, s: (6 + Math.random() * 10) * k, r: Math.random() * 6, vr: (Math.random() - .5) * .3, c: COLORS[i % COLORS.length], life: 0 });
@@ -897,7 +897,7 @@ canvas#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
     bits = bits.filter(function (b) { return b.y < cv.height + 40 && b.life < 400; });
     if (bits.length) requestAnimationFrame(cf); else { running = false; cx.clearRect(0, 0, cv.width, cv.height); }
   }
-  var lines = ['Wish received. Processing in Moscow.', 'The PastizZ Party approves this wish.', 'Another one? Greedy. Fine.', 'Lokomotiv win the league. Noted.', 'Ms Farrugia grants this wish 25/25.'], w = 0;
+  var lines = ['Wish received. Processing in Moscow.', 'The PastizZ Party approves.', 'Another one? Greedy. Fine.', 'Lokomotiv win the league. Noted.', 'Ms Farrugia gives it 25/25.'], w = 0;
   document.getElementById('wish').addEventListener('click', function () { burst(); document.getElementById('after').textContent = lines[w++ % lines.length]; });
 })();
 </script>
