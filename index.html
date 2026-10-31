@@ -10,7 +10,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Caveat:wght@500;700&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=IM+Fell+English:ital@0;1&family=Caveat:wght@500;700&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:ital,wght@0,400;0,600;1,400&display=swap">
 <style>
 /* Layout: an airport departures board opens a flight log; each stop is a stamped chapter with pinned polaroids, then the PastizZ Party card, then the letter. */
 :root {
@@ -31,6 +31,11 @@
   --f-body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
   --f-hand: "Caveat", "Segoe Print", "Bradley Hand", cursive;
+  --f-old: "IM Fell English", Georgia, "Times New Roman", serif;
+  --parch: #F6EED9;
+  --parch-ink: #2A2216;
+  --exam: #FBFBF7;
+  --rule: #B8CBE0;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --paper: #0F1612; --ink: #E5EBE4; --muted: #94A39A; --card: #18211C; --line: #2A3630;
@@ -121,6 +126,9 @@ section { padding-block: 44px; }
 .map .dots { fill: var(--line); }
 .map .route { fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-dasharray: 2 7; stroke-linecap: round; opacity: .55; }
 .map .future { fill: none; stroke: var(--red); stroke-width: 2.2; stroke-dasharray: 2 9; stroke-linecap: round; opacity: .8; }
+.map .tether { fill: none; stroke: var(--green); stroke-width: 1.6; stroke-dasharray: 6 5; opacity: .7; }
+.map .tether-label { font-family: var(--f-mono); font-size: 11px; fill: var(--green); letter-spacing: .06em; }
+.map .city.home circle.o { fill: var(--green); stroke: var(--green); }
 .map .city circle.o { fill: var(--card); stroke: var(--ink); stroke-width: 2; transition: fill .3s; }
 .map .city.lit circle.o { fill: var(--green); stroke: var(--green); }
 .map .city.future-c circle.o { stroke: var(--red); }
@@ -205,6 +213,72 @@ section { padding-block: 44px; }
 .ticket .v { font-family: var(--f-mono); font-weight: 600; font-size: 14px; }
 .barcode { height: 54px; background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 4px, var(--ink) 4px 5px, transparent 5px 9px, var(--ink) 9px 12px, transparent 12px 14px); opacity: .85; }
 .ticket.ru .stub { background: color-mix(in srgb, var(--red) 9%, var(--card)); }
+
+/* ---------- EXAM PAPER ---------- */
+.exam {
+  background: var(--exam);
+  color: #1E2430;
+  border-radius: 4px;
+  box-shadow: var(--shadow);
+  padding: 26px 26px 26px 58px;
+  position: relative;
+  transform: rotate(1deg);
+  background-image: linear-gradient(90deg, transparent 44px, #E8A0A0 44px 46px, transparent 46px), repeating-linear-gradient(transparent 0 31px, var(--rule) 31px 32px);
+  background-position: 0 0, 0 14px;
+  display: grid;
+  gap: 12px;
+}
+.exam .hd { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #4A5468; }
+.exam .q { font-weight: 600; line-height: 1.5; padding-right: 96px; }
+.exam .q small { font-weight: 400; color: #4A5468; }
+.exam .a { font-family: var(--f-hand); font-size: 25px; line-height: 32px; color: #1F3B8C; }
+.exam .mark { position: absolute; right: 18px; top: 46px; font-family: var(--f-hand); font-weight: 700; font-size: 44px; color: #C8102E; transform: rotate(-10deg); line-height: 1; border: 3px solid #C8102E; border-radius: 50%; padding: 10px 8px 4px; }
+.exam .see { font-family: var(--f-hand); font-size: 26px; color: #C8102E; transform: rotate(-2deg); justify-self: end; line-height: 1.1; text-align: right; }
+
+/* ---------- DISTANCE REPORT ---------- */
+.dist { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 22px; display: grid; gap: 18px; }
+.dist .ends { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
+.dist .end { display: grid; text-align: center; gap: 2px; }
+.dist .end b { font-family: var(--f-display); font-size: 46px; line-height: .9; }
+.dist .end span { font-family: var(--f-mono); font-size: 10px; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
+.dist .track { position: relative; height: 24px; border-bottom: 2px dashed var(--line); }
+.dist .track span { position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%); background: var(--card); padding: 0 8px; font-family: var(--f-mono); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.dist dl { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0; font-size: 15px; }
+.dist dt, .dist dd { margin: 0; padding: 9px 0; border-top: 1px solid var(--line); }
+.dist dt { color: var(--muted); }
+.dist dd { font-family: var(--f-mono); font-weight: 600; text-align: right; }
+.dist dd.good { color: var(--green); }
+
+/* ---------- TREATY ---------- */
+.treaty {
+  background: var(--parch);
+  color: var(--parch-ink);
+  max-width: 820px;
+  margin: 0 auto;
+  padding: clamp(26px, 5vw, 56px);
+  border-radius: 3px;
+  box-shadow: var(--shadow), inset 0 0 60px rgba(150,110,40,.18);
+  font-family: var(--f-old);
+  font-size: clamp(17px, 2.1vw, 19px);
+  line-height: 1.6;
+  display: grid;
+  gap: 18px;
+  position: relative;
+}
+.treaty .eyebrow { font-family: var(--f-mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: #7A6440; text-align: center; }
+.treaty h2 { font-family: var(--f-old); font-weight: 400; font-size: clamp(36px, 6vw, 60px); text-align: center; line-height: 1.05; letter-spacing: 0; }
+.treaty .pre { font-style: italic; text-align: center; max-width: 56ch; margin: 0 auto; }
+.treaty ol { margin: 0; padding: 0; list-style: none; counter-reset: a; display: grid; gap: 12px; }
+.treaty li { counter-increment: a; display: grid; grid-template-columns: 104px 1fr; gap: 10px; }
+.treaty li::before { content: "Article " counter(a, upper-roman); font-variant: small-caps; color: #8A2A1A; white-space: nowrap; }
+.treaty .sigs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; margin-top: 10px; }
+.treaty .sig { display: grid; gap: 4px; align-content: end; position: relative; }
+.treaty .sig .name { font-family: var(--f-hand); font-size: 40px; line-height: 1; min-height: 44px; color: #1F3B8C; }
+.treaty .sig .name.blank { color: #9C8A66; font-size: 22px; display: flex; align-items: end; }
+.treaty .sig .ln { border-top: 1px solid var(--parch-ink); padding-top: 4px; font-size: 14px; font-style: italic; }
+.seal { position: absolute; right: 0; bottom: 18px; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-family: var(--f-old); font-size: 24px; color: rgba(255,255,255,.85); box-shadow: inset 0 0 0 4px rgba(0,0,0,.15), 0 2px 4px rgba(0,0,0,.3); transform: rotate(-8deg); }
+.seal.g { background: #0B6B39; }
+.seal.r { background: #A50F25; transform: rotate(10deg); }
 
 /* ---------- ARCHIVE ---------- */
 .archive { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; align-items: start; }
@@ -315,6 +389,10 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
   .letter .postmark { width: 72px; height: 72px; top: 22px; }
   .letter .postmark b { font-size: 17px; }
   .manifesto li { grid-template-columns: 1fr; gap: 0; }
+  .treaty li { grid-template-columns: 1fr; gap: 0; }
+  .treaty .sigs { grid-template-columns: minmax(0, 1fr); }
+  .exam { padding-left: 52px; }
+  .exam .mark { font-size: 34px; right: 10px; top: 40px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -352,7 +430,7 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
       </div>
     </div>
 
-    <p class="intro">For <strong>Maxim Antipov</strong>, Max to everyone who matters. Lokomotiv Moscow loyalist, LUISS brain, co-founder of the PastizZ Party, and the only person I know born on Halloween who isn't remotely scary.</p>
+    <p class="intro">For <strong>Maxim Antipov</strong>, Max to everyone who matters. History nerd, politics nerd, Lokomotiv Moscow loyalist, LUISS brain, co-founder of the PastizZ Party, and the only person I know born on Halloween who isn't remotely scary.</p>
     <div class="langs">
       <span>С днём рождения, Макс!</span>
       <span>Buon compleanno!</span>
@@ -376,6 +454,8 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
           <rect width="620" height="500" fill="url(#dotgrid)"/>
           <path id="route" class="route" d=""/>
           <path id="future" class="future" d=""/>
+          <path id="tether" class="tether" d=""/>
+          <text id="tether-label" class="tether-label" text-anchor="middle"></text>
           <g id="cities"></g>
           <g id="plane" class="plane"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z" transform="scale(1.5)"/></g>
         </svg>
@@ -385,7 +465,8 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
           <li><span class="c">MLA</span><span>Malta, 2021<small>Where I landed and where it all started</small></span></li>
           <li><span class="c">BCN</span><span>Barcelona, 2022<small>The lads' trip</small></span></li>
           <li><span class="c">MIL</span><span>Milan<small>Just the two of us</small></span></li>
-          <li><span class="c">ROM</span><span>Rome, today<small>Your city. Birthday lunch.</small></span></li>
+          <li><span class="c">ROM</span><span>Rome, today<small>Your city, your uni. Birthday lunch.</small></span></li>
+          <li><span class="c">DUB</span><span>Dublin<small>My uni. 1,886 km away, still close.</small></span></li>
           <li><span class="c f">MOW</span><span>Moscow, someday<small>Booked in spirit</small></span></li>
         </ol>
       </div>
@@ -398,7 +479,7 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
       <span class="stamp"><span>Arrived</span><b>MLA</b><span>2021</span></span>
       <h3 id="mla-h">Malta, where it started</h3>
       <p>I landed in Malta in 2021, and somewhere between football, nights at the national stadium and far too many pastizzi, you became one of my best friends.</p>
-      <p>Five years later I still can't fully explain how a guy from Ireland and a guy who'd die for Lokomotiv Moscow ended up this close. I'm just glad we did.</p>
+      <p>Five years later I still can't fully explain how a guy from Ireland and a guy who'd die for Lokomotiv Moscow ended up this close. Historians will be studying it for centuries. I'm just glad we did.</p>
       <div class="flightline" aria-hidden="true"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></div>
     </div>
     <div class="pile">
@@ -407,8 +488,26 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
     </div>
   </article>
 
+  <!-- CHAPTER: HISTORY CLASS -->
+  <article class="chapter flip" aria-labelledby="hist-h">
+    <div class="text">
+      <span class="stamp gold"><span>Classroom</span><b>HIST</b><span>Ms Farrugia</span></span>
+      <h3 id="hist-h">History with Ms Farrugia</h3>
+      <p>Good times. Two people who actually liked history, in a room full of people counting down to the bell. Treaties, revolutions, empires rising and falling, and the two of us turning every lesson into a debate.</p>
+      <p>We still do it now. Most friends talk about football. We talk about football, and then spend three hours on the fall of the Roman Empire and whatever's happening in politics that week.</p>
+      <p class="note">Ms Farrugia, if you're reading this: it was mostly Max talking.</p>
+    </div>
+    <div class="exam" aria-label="A mock history exam answer">
+      <div class="hd"><span>History · Paper 1</span><span>Teacher: Ms Farrugia</span></div>
+      <p class="q">Q1. Two students share a history class in Malta. Assess the long-term consequences. <small>(25 marks)</small></p>
+      <p class="a">A lasting alliance. Survived Barcelona, Milan, two universities, two countries and long periods of radio silence. Never weakened. Consequences: permanent.</p>
+      <span class="mark" aria-label="25 out of 25">25/25</span>
+      <p class="see">Excellent. Now stop talking.<br>— Ms F</p>
+    </div>
+  </article>
+
   <!-- CHAPTER: BARCELONA -->
-  <article class="chapter flip" aria-labelledby="bcn-h">
+  <article class="chapter" aria-labelledby="bcn-h">
     <div class="text">
       <span class="stamp red"><span>Arrived</span><b>BCN</b><span>2022</span></span>
       <h3 id="bcn-h">Barcelona, four years ago</h3>
@@ -424,7 +523,7 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
   </article>
 
   <!-- CHAPTER: MILAN -->
-  <article class="chapter" aria-labelledby="mil-h">
+  <article class="chapter flip" aria-labelledby="mil-h">
     <div class="text">
       <span class="stamp gold"><span>Arrived</span><b>MIL</b><span>Duo</span></span>
       <h3 id="mil-h">Milan, just us two</h3>
@@ -450,16 +549,42 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
   </article>
 
   <!-- CHAPTER: ROME -->
-  <article class="chapter flip" aria-labelledby="rom-h">
+  <article class="chapter" aria-labelledby="rom-h">
     <div class="text">
       <span class="stamp"><span>Now</span><b>ROM</b><span>31·10·26</span></span>
       <h3 id="rom-h">Rome, right now</h3>
-      <p>You live here now and you're studying at LUISS, which surprises nobody, because you're one of the smartest people I know.</p>
+      <p>You live here now and you're studying at LUISS, which surprises nobody, because you're one of the smartest people I know. Of course the history and politics guy moved to the city with more history per square metre than anywhere on Earth. For you it's basically a theme park.</p>
       <p>And today I'm in your city, taking you to lunch on your birthday. Not bad for two guys who met in Malta.</p>
       <div class="flightline" aria-hidden="true"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></div>
     </div>
     <div class="pile one">
       <button class="polaroid" style="--r:1.5deg" data-cap="One of us was excited about the chicken. One of us was not."><img src="photos/nandos.jpg" alt="Two friends at a restaurant table, one frowning and one grinning, with chicken and chips" loading="lazy"><span class="cap">Lunch preview. One of us was excited about the chicken.</span></button>
+    </div>
+  </article>
+
+  <!-- CHAPTER: DUBLIN <-> ROME -->
+  <article class="chapter flip" aria-labelledby="dist-h">
+    <div class="text">
+      <span class="stamp red"><span>Two unis</span><b>DUB⇄ROM</b><span>2 countries</span></span>
+      <h3 id="dist-h">Dublin and Rome</h3>
+      <p>These days I'm at uni in Dublin and you're at uni in Rome. Different countries, different lives, and we can go ages without seeing each other.</p>
+      <p>Then we do, and it's like no time has passed at all. Same jokes, same arguments about history, same everything. That's how I know this one's real.</p>
+      <div class="flightline" aria-hidden="true"><svg viewBox="-14 -10 28 20"><path d="M0,-3 L10,-1.2 L13,0 L10,1.2 L0,3 L-2,9 L-5,9 L-3,2 L-9,1.6 L-11,5 L-13,5 L-12,0 L-13,-5 L-11,-5 L-9,-1.6 L-3,-2 L-5,-9 L-2,-9 Z"/></svg></div>
+    </div>
+    <div class="dist" aria-label="Distance report">
+      <span class="mono" style="color:var(--muted)">Official distance report</span>
+      <div class="ends">
+        <div class="end"><b>DUB</b><span>Scott</span></div>
+        <div class="track"><span>1,886 km</span></div>
+        <div class="end"><b>ROM</b><span>Max</span></div>
+      </div>
+      <dl>
+        <dt>Time since we last saw each other</dt><dd>Ages</dd>
+        <dt>Messages per week</dt><dd>Irrelevant</dd>
+        <dt>Closeness lost</dt><dd class="good">0%</dd>
+        <dt>Time to pick up where we left off</dt><dd class="good">~4 seconds</dd>
+        <dt>Status</dt><dd class="good">Exactly the same</dd>
+      </dl>
     </div>
   </article>
 
@@ -489,6 +614,27 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
     </div>
   </article>
 
+  <!-- TREATY -->
+  <section aria-labelledby="treaty-h" style="border-top:1px solid var(--line)">
+    <div class="treaty">
+      <span class="eyebrow">A document of great historical importance</span>
+      <h2 id="treaty-h">The Treaty of Valletta</h2>
+      <p class="pre">Concluded at Malta in the year 2021. Ratified at Barcelona, at Milan, and at Rome on the thirty-first day of October 2026. Between the Irish Party (Scott, now of Dublin) and the Lokomotiv Party (Max, now of Rome).</p>
+      <ol>
+        <li>The High Contracting Parties shall remain best friends in perpetuity.</li>
+        <li>The 1,886 km between Dublin and Rome shall have no effect whatsoever on this alliance.</li>
+        <li>Long periods without seeing each other shall not count as withdrawal. When the Parties meet again, they shall carry on exactly where they left off, as is customary.</li>
+        <li>Disputes over history and politics shall be settled the traditional way: arguing for three hours, then food.</li>
+        <li>The Irish Party commits to a state visit to Moscow, date to be confirmed.</li>
+        <li>This treaty has no expiry date and no exit clause. Nobody is leaving.</li>
+      </ol>
+      <div class="sigs">
+        <div class="sig"><span class="name">Scott</span><span class="ln">For the Irish Party</span><span class="seal g" aria-hidden="true">S</span></div>
+        <div class="sig"><span class="name blank">sign here at lunch →</span><span class="ln">For the Lokomotiv Party</span><span class="seal r" aria-hidden="true">M</span></div>
+      </div>
+    </div>
+  </section>
+
   <!-- ARCHIVE -->
   <section aria-labelledby="arc-h" style="border-top:1px solid var(--line)">
     <div class="sec-head">
@@ -496,7 +642,7 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
       <h2 id="arc-h">Declassified files</h2>
     </div>
     <div class="archive">
-      <button class="polaroid" style="--r:-3deg; --ar:3/4" data-cap="No explanation will be given at this time."><img src="photos/towel.jpg" alt="Two friends pouting, one wearing a hoodie wrapped on his head" loading="lazy"><span class="cap">No explanation will be given at this time.</span><span class="tag">FILE 001</span></button>
+      <button class="polaroid" style="--r:-3deg; --ar:3/4" data-cap="No explanation will be given at this time."><img src="photos/towel.jpg" alt="Two friends pouting, one wearing a hoodie wrapped on his head" loading="lazy"><span class="cap">Historians remain divided on this one.</span><span class="tag">FILE 001</span></button>
       <button class="polaroid" style="--r:2deg; --ar:618/1100" data-cap="&quot;like da flex?&quot; Yes. Obviously."><img src="photos/mirror.jpg" alt="Mirror selfie screenshot captioned like da flex" loading="lazy"><span class="cap">"like da flex?" Yes. Obviously.</span><span class="tag">FILE 002</span></button>
       <button class="polaroid" style="--r:-1.5deg" data-cap="The squad. Fists clenched, egos larger."><img src="photos/squad.jpg" alt="Group of friends in football shirts on a pitch" loading="lazy"><span class="cap">The squad. Two Arsenal shirts, one Celtic. Unacceptable.</span><span class="tag">FILE 003</span></button>
     </div>
@@ -524,6 +670,7 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
           <li>Lokomotiv Moscow are granted honorary Maltese status and a guaranteed Champions League spot.</li>
           <li>Comrade Max is appointed Minister for Being Annoyingly Smart.</li>
           <li>Comrade Scott is appointed Minister for Irish Affairs and Overly Long Birthday Websites.</li>
+          <li>Ms Farrugia is appointed Minister of Education. The Great Siege of 1565 becomes the national curriculum.</li>
         </ol>
         <p class="fine">Satire. Nobody is annexing anything, except possibly the last pastizz.</p>
       </div>
@@ -539,9 +686,10 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
       <div class="body">
         <p class="hi">Max,</p>
         <p>Happy birthday man. I wanted to give you something a bit better than a text, so here we are.</p>
-        <p>Since I landed in Malta in 2021, you've been one of my best friends. Barcelona, Milan, the football, the stupid nights, all of it. And now I'm sitting in Rome, the city you call home, about to take you to lunch on your birthday. When I think about where we started, that's pretty special.</p>
-        <p>We don't talk all the time, and we don't need to. Our friendship has never needed to be constant. We can go weeks without speaking and pick up exactly where we left off, and to me that's the best kind of friendship there is.</p>
+        <p>Since I landed in Malta in 2021, you've been one of my best friends. History with Ms Farrugia, Barcelona, Milan, the football, the stupid nights, all of it. Somewhere along the way we became the two people who'd happily argue about history and politics for three hours while everyone else wanted to go home. I wouldn't change that for anything.</p>
+        <p>Now I'm at uni in Dublin and you're in Rome. Different countries, different lives, and sometimes we go ages without seeing each other. But every time we do, it's like no time has passed. Same jokes, same debates, same us. We don't talk all the time, and we don't need to. Our friendship has never needed to be constant to be real, and to me that's the best kind there is.</p>
         <p>You're one of the smartest people I know, and somehow one of the kindest too. You're a genuinely good person, Max. I'm proud of you and everything you're doing, and I'm really lucky to have you as a mate.</p>
+        <p>Future historians will note that I flew to Rome for your birthday lunch. Make sure they get that part right.</p>
         <p>I love you, brother. Here's to another year, and to Moscow next.</p>
         <p class="sig">Scott</p>
       </div>
@@ -600,11 +748,11 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
   document.querySelector('.board').addEventListener('click', function () { if (!reduce) shuffle(); });
 
   /* ---- route map ---- */
-  var P = function (lon, lat) { return [(lon + 2) * 14, (58 - lat) * 20]; };
+  var P = function (lon, lat) { return [(lon + 9) * 13, (58 - lat) * 20]; };
   var cities = [
     { code: 'MLA', name: 'MALTA', y: '2021', p: P(14.51, 35.9), dx: 12, dy: 5 },
     { code: 'BCN', name: 'BARCELONA', y: '2022', p: P(2.17, 41.39), dx: -6, dy: 26, anchor: 'start' },
-    { code: 'MIL', name: 'MILANO', y: 'DUO', p: P(9.19, 45.46), dx: -12, dy: -12, anchor: 'end' },
+    { code: 'MIL', name: 'MILANO', y: 'DUO', p: P(9.19, 45.46), dx: 12, dy: -8 },
     { code: 'ROM', name: 'ROMA', y: 'NOW', p: P(12.5, 41.9), dx: 13, dy: 4 },
     { code: 'MOW', name: 'МОСКВА', y: 'SOMEDAY', p: P(37.6, 55.75), dx: -14, dy: 4, anchor: 'end', future: true }
   ];
@@ -621,10 +769,19 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
   var future = document.getElementById('future');
   future.setAttribute('d', 'M' + cities[3].p.join(',') + ' ' + curve(cities[3].p, cities[4].p, .22));
 
+  // Dublin: where I study now, tethered to Rome where Max studies
+  var dub = { code: 'DUB', name: 'DUBLIN', y: 'SCOTT · UNI', p: P(-6.26, 53.35), dx: 12, dy: 5, home: true };
+  var rom = cities[3].p;
+  document.getElementById('tether').setAttribute('d', 'M' + dub.p.join(',') + ' ' + curve(dub.p, rom, -.12));
+  var tl = document.getElementById('tether-label');
+  var mid = [(dub.p[0] + rom[0]) / 2, (dub.p[1] + rom[1]) / 2];
+  tl.setAttribute('x', (mid[0] - 44).toFixed(1)); tl.setAttribute('y', (mid[1] + 16).toFixed(1));
+  tl.textContent = '1,886 KM';
+
   var g = document.getElementById('cities'), ns = 'http://www.w3.org/2000/svg';
-  cities.forEach(function (c) {
+  cities.concat([dub]).forEach(function (c) {
     var grp = document.createElementNS(ns, 'g');
-    grp.setAttribute('class', 'city' + (c.future ? ' future-c' : ''));
+    grp.setAttribute('class', 'city' + (c.future ? ' future-c' : '') + (c.home ? ' home' : ''));
     var o = document.createElementNS(ns, 'circle');
     o.setAttribute('class', 'o'); o.setAttribute('cx', c.p[0]); o.setAttribute('cy', c.p[1]); o.setAttribute('r', 7);
     var t = document.createElementNS(ns, 'text');
@@ -655,7 +812,7 @@ dialog#lb button { position: absolute; top: 4px; right: 4px; background: #fff; b
     var p = path.getPointAtLength(s);
     plane.setAttribute('transform', 'translate(' + p.x.toFixed(1) + ',' + p.y.toFixed(1) + ') rotate(' + ang.toFixed(1) + ')');
   }
-  function light(n) { cities.forEach(function (c, i) { c.el.classList.toggle('lit', i <= n); }); }
+  function light(n) { cities.slice(0, 5).forEach(function (c, i) { c.el.classList.toggle('lit', i <= n); }); }
 
   if (reduce) {
     place(route, L1, L1); light(3);
